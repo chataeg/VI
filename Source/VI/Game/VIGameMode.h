@@ -14,4 +14,9 @@ class VI_API AVIGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 	
+
+public:
+
+	AVIGameMode();
+	
 };

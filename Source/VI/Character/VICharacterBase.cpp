@@ -2,33 +2,34 @@
 
 
 #include "Character/VICharacterBase.h"
+#include "Components/CapsuleComponent.h"
 
 // Sets default values
 AVICharacterBase::AVICharacterBase()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
 
-}
+	// Pawn
+	bUseControllerRotationPitch = true;
+	bUseControllerRotationYaw = true;
+	bUseControllerRotationRoll = true;
 
-// Called when the game starts or when spawned
-void AVICharacterBase::BeginPlay()
-{
-	Super::BeginPlay();
 	
-}
+    GetCapsuleComponent()->InitCapsuleSize(42.0f,96.0f);
 
-// Called every frame
-void AVICharacterBase::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
+	
+	/*
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> CharacterMeshRef(TEXT("/Script/Engine.SkeletalMesh'/Game/Characters/Mannequins/Meshes/SKM_Manny.SKM_Manny'"));
+	if (CharacterMeshRef.Object)
+	{
+		GetMesh()->SetSkeletalMesh(CharacterMeshRef.Object);
+	}
 
-}
 
-// Called to bind functionality to input
-void AVICharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
+	// Set Mesh Location and Rotation
+	GetMesh()->SetRelativeLocation(FVector(0.0f, 0.0f, -90.0f));
+	GetMesh()->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f)); 
+	*/
+
 
 }
 
