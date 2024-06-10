@@ -11,4 +11,6 @@ AVIAKWeapon::AVIAKWeapon()
 	ReloadTime = 2.0f;
 	BulletSpread = 500.0f;
 
+	//UE_LOG(LogTemp, Log, TEXT("AKWeapon Constructor"));
+
 }

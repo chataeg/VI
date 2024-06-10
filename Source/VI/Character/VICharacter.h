@@ -43,6 +43,12 @@ protected:
 	TObjectPtr<class USkeletalMeshComponent> FirstPersonMesh;
 
 protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = PostProcess)
+	
+	TObjectPtr <class UPostProcessComponent> PostProcessComponent;
+	
+
+protected:
 	// Weapon Section
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon, Meta = (AllowPrivateAccess = "true"))
 	bool bIsReloading;
@@ -50,6 +56,11 @@ protected:
 	UPROPERTY()
 
 	bool bDoOnceReload;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+
+	int32 Health;
+
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon , Meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<class AActor> PrimaryWeaponBpRef;

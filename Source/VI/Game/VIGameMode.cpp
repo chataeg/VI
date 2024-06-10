@@ -2,6 +2,7 @@
 
 
 #include "Game/VIGameMode.h"
+#include "GameFrameWork/HUD.h"
 
 AVIGameMode::AVIGameMode()
 {
@@ -17,5 +18,13 @@ AVIGameMode::AVIGameMode()
 	{
 		PlayerControllerClass = PlayerControllerClassRef.Class;
 	}
+
+	static ConstructorHelpers::FClassFinder<AHUD> HUDClassRef(TEXT("/Script/Engine.Blueprint'/Game/VI/Character/Blueprint/BP_HUD.BP_HUD_C'"));
+	if (HUDClassRef.Class)
+	{
+		HUDClass = HUDClassRef.Class;
+	}
+
+
 
 }

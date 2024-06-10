@@ -35,6 +35,7 @@ AVIWeaponbase::AVIWeaponbase()
 	BulletSpread = 500.0f;
 
 
+	//UE_LOG(LogTemp, Log, TEXT("Weaponbase Constructor"));
 }
 
 // Called when the game starts or when spawned
@@ -65,7 +66,6 @@ void AVIWeaponbase::Reload()
 
 	FTimerHandle ReloadTimeHandle;
 
-
 	GetWorld()->GetTimerManager().SetTimer(ReloadTimeHandle, FTimerDelegate::CreateLambda([&]()
 	{
 		SetAmmoCount(GetMaxAmmo());
@@ -73,31 +73,30 @@ void AVIWeaponbase::Reload()
 		// TimerHandle ÃÊ±âÈ­
 		GetWorld()->GetTimerManager().ClearTimer(ReloadTimeHandle);
 	}), ReloadTime, false);
+
 }
 
 void AVIWeaponbase::AmmoCheck()
 {
-	
-	AmmoCount--;
-
 	//DF("Ammo %d",AmmoCount);
 
 	if (UWorld* World = GetWorld())
 	{
-		// Get the player controller for the first player (index 0)
 		APlayerController* PC = UGameplayStatics::GetPlayerController(World, 0);
-		
+
 		if (PC)
 		{
 			AVICharacter* Character = Cast<AVICharacter>(PC->GetCharacter());
-
-			if (!Character->GetbIsReloading())
+			if (Character)
 			{
-				Mesh->PlayAnimation(FireActionAnimation, false);
-				UE_LOG(LogTemp, Log, TEXT("Fire Animation "));
-				LineTrace();
+				if (!Character->GetbIsReloading())
+				{
+					AmmoCount--;
+					Mesh->PlayAnimation(FireActionAnimation, false);
+					UE_LOG(LogTemp, Log, TEXT("Fire Animation "));
+					LineTrace();
+				}
 			}
-
 		
 		}
 	
@@ -116,12 +115,14 @@ void AVIWeaponbase::LineTrace()
 		{
 			AVICharacter* Character = Cast<AVICharacter>(PC->GetCharacter());
 
-			FHitResult HitResult;
-			 FVector TraceStart = Character->GetCamera()->GetComponentLocation();
-			 FVector TraceEnd = Character->GetCamera()->GetForwardVector() * 20000.0f + TraceStart;
-			
+			// Camera Linetrace
 
+			FHitResult HitResult;
+			FVector TraceStart = Character->GetCamera()->GetComponentLocation();
+			FVector TraceEnd = Character->GetCamera()->GetForwardVector() * 20000.0f + TraceStart;
+			
 			/* ÅºÆÛÁü ¼³Á¤
+			 
 			FVector BulletSpreadRandVector(
 			FMath::RandRange(BulletSpread * -1.0f, BulletSpread)
 			, FMath::RandRange(BulletSpread * -1.0f, BulletSpread)
@@ -129,6 +130,7 @@ void AVIWeaponbase::LineTrace()
 			);
 				
 			TraceEnd = TraceEnd + BulletSpreadRandVector;
+			
 			*/
 
 			TArray<AActor*> ActorsToIgnore;
@@ -151,6 +153,8 @@ void AVIWeaponbase::LineTrace()
 				ColorsLifeTime
 			))
 			{
+				// Muzzle Linetrace
+
 				FHitResult HitResultMuzzle;
 				FVector TraceStartMuzzle = Muzzle->GetComponentLocation();
 				FVector TraceEndMuzzle = HitResult.ImpactPoint;
@@ -159,6 +163,7 @@ void AVIWeaponbase::LineTrace()
 				FColor ColorBeforeHitMuzzle = FColor::Green;
 				FColor ColorAfterHitMuzzle = FColor::Green;
 				float ColorsLifeTimeMuzzle = 5.f;
+
 
 				UKismetSystemLibrary::LineTraceSingle(
 					World,

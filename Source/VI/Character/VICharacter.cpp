@@ -13,7 +13,7 @@
 #include "VI/Player/VIPlayerController.h"
 
 #include "GameFramework/CharacterMovementComponent.h"
-
+#include "Components/PostProcessComponent.h"
 
 AVICharacter::AVICharacter()
 {
@@ -33,7 +33,7 @@ AVICharacter::AVICharacter()
 
 	bIsReloading = false;
 	bDoOnceReload = false;
-
+	Health = 100;
 
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> FirstPersonMeshRef(TEXT("/Script/Engine.SkeletalMesh'/Game/WeaponAssets/RiggedMeshes/FPSArms_rigged.FPSArms_rigged'"));
 	if (FirstPersonMeshRef.Object)
@@ -46,6 +46,9 @@ AVICharacter::AVICharacter()
 
 
 	FirstPersonMesh->SetAnimationMode(EAnimationMode::AnimationBlueprint);
+
+	PostProcessComponent = CreateDefaultSubobject<UPostProcessComponent>(TEXT("PostProcessComponent"));
+	PostProcessComponent->SetupAttachment(RootComponent);
 
 	
 	// 애니메이션 블루프린트 로딩 시 크래시가 일어나 블루프린트에서 로딩합니다.
@@ -60,24 +63,11 @@ AVICharacter::AVICharacter()
 	}
 	*/
 	
-
-
-	/*
-	static ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstanceRef(TEXT("/Script/Engine.AnimBlueprint'/Game/FirstPersonArms/Animations/FirstPerson_AnimBP.FirstPerson_AnimBP_C'"));
-	if (AnimInstanceRef.Class != nullptr)
-	{
-		FirstPersonMesh->SetAnimInstanceClass(AnimInstanceRef.Class);
-		FirstPersonMesh->SetAnimationMode(EAnimationMode::AnimationBlueprint);
-	}
-	*/
 	static ConstructorHelpers::FClassFinder<AActor> AKWeaponBp(TEXT("/Script/Engine.Blueprint'/Game/VI/Character/Blueprint/BP_AKWeapon.BP_AKWeapon_C'"));
 	if (AKWeaponBp.Succeeded())
 	{
 		PrimaryWeaponBpRef = AKWeaponBp.Class;
 	}
-
-
-
 
 
 	static ConstructorHelpers::FObjectFinder<UInputMappingContext> InputMappingContextRef(TEXT("/Script/EnhancedInput.InputMappingContext'/Game/VI/Character/Input/IMC_Default.IMC_Default'"));

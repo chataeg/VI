@@ -24,16 +24,18 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION()
 	void Fire();
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION()
 	void Reload();
 
 	FORCEINLINE int32 GetAmmoCount() const { return AmmoCount; };
 	FORCEINLINE void SetAmmoCount(int32 NewAmmoCount) { AmmoCount = NewAmmoCount; };
+
 	FORCEINLINE int32 GetMaxAmmo() const { return MaxAmmo; };
 	FORCEINLINE void SetMaxAmmo(int32 NewMaxAmmo) { MaxAmmo = NewMaxAmmo; };
+	
 	FORCEINLINE int32 GetReloadTime() const { return ReloadTime; };
 
 
