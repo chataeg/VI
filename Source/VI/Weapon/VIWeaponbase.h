@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Animation/AnimationAsset.h"
 #include "VIWeaponbase.generated.h"
 
 UCLASS()
@@ -23,13 +24,33 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	UFUNCTION(BlueprintCallable)
+	void Fire();
+
+	UFUNCTION(BlueprintCallable)
+	void Reload();
+
+	FORCEINLINE int32 GetAmmoCount() const { return AmmoCount; };
+	FORCEINLINE void SetAmmoCount(int32 NewAmmoCount) { AmmoCount = NewAmmoCount; };
+	FORCEINLINE int32 GetMaxAmmo() const { return MaxAmmo; };
+	FORCEINLINE void SetMaxAmmo(int32 NewMaxAmmo) { MaxAmmo = NewMaxAmmo; };
+	FORCEINLINE int32 GetReloadTime() const { return ReloadTime; };
+
+
 protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon, Meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class USkeletalMeshComponent> PrimaryWeapon;
+	TObjectPtr<class USkeletalMeshComponent> Mesh;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class USceneComponent> Muzzle;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Weapon, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UAnimationAsset> FireActionAnimation;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Weapon, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UAnimationAsset> ReloadActionAnimation;
+
 
 
 protected:
@@ -46,13 +67,12 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Meta = (AllowPrivateAccess = "true"))
 	int32 MaxAmmo;
 
-	UFUNCTION(BlueprintCallable)
-	void Fire();
+	
+	UFUNCTION()
+	void AmmoCheck();
 
-	UFUNCTION(BlueprintCallable)
-	void Reload();
-
-
+	UFUNCTION()
+	void LineTrace();
 
 
 

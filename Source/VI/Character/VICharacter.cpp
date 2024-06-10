@@ -8,6 +8,8 @@
 #include "InputMappingContext.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "Weapon/VIWeaponbase.h"
+#include "Weapon/VIAKWeapon.h"
 #include "VI/Player/VIPlayerController.h"
 
 #include "GameFramework/CharacterMovementComponent.h"
@@ -27,6 +29,10 @@ AVICharacter::AVICharacter()
 	FirstPersonMesh->SetOnlyOwnerSee(true);
 	FirstPersonMesh->bCastDynamicShadow = false;
 	FirstPersonMesh->CastShadow = false;
+
+
+	bIsReloading = false;
+	bDoOnceReload = false;
 
 
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> FirstPersonMeshRef(TEXT("/Script/Engine.SkeletalMesh'/Game/WeaponAssets/RiggedMeshes/FPSArms_rigged.FPSArms_rigged'"));
@@ -54,10 +60,7 @@ AVICharacter::AVICharacter()
 	}
 	*/
 	
-	
-	
-	
-	
+
 
 	/*
 	static ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstanceRef(TEXT("/Script/Engine.AnimBlueprint'/Game/FirstPersonArms/Animations/FirstPerson_AnimBP.FirstPerson_AnimBP_C'"));
@@ -101,10 +104,16 @@ AVICharacter::AVICharacter()
 		LookAction = InputActionLookRef.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionShootRef(TEXT("/Script/EnhancedInput.InputAction'/Game/VI/Character/Input/Actions/IA_Shoot.IA_Shoot'"));
-	if (nullptr != InputActionShootRef.Object)
+	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionFireRef(TEXT("/Script/EnhancedInput.InputAction'/Game/VI/Character/Input/Actions/IA_Fire.IA_Fire'"));
+	if (nullptr != InputActionFireRef.Object)
 	{
-		ShootAction = InputActionShootRef.Object; 
+		FireAction = InputActionFireRef.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionReloadRef(TEXT("/Script/EnhancedInput.InputAction'/Game/VI/Character/Input/Actions/IA_Reload.IA_Reload'"));
+	if (nullptr != InputActionReloadRef.Object)
+	{
+		ReloadAction = InputActionReloadRef.Object;
 	}
 
 
@@ -116,7 +125,7 @@ void AVICharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-
+	// 
 
 	
 }
@@ -131,6 +140,10 @@ void AVICharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AVICharacter::Move);
 	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AVICharacter::Look);
+
+	EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this, &AVICharacter::Fire);
+	EnhancedInputComponent->BindAction(ReloadAction, ETriggerEvent::Triggered, this, &AVICharacter::Reload);
+
 
 }
 
@@ -158,7 +171,7 @@ void AVICharacter::SpawnInitialPrimaryWeapon()
 	{
 		if (PrimaryWeaponBpRef != nullptr)
 		{
-			// 스폰할 위치와 회전을 지정합니다.
+			// 스폰할 위치와 회전을 지정
 			FVector SpawnLocation = FVector(0.0f, 0.0f, 0.0f);
 			FRotator SpawnRotation = FRotator(0.0f, 0.0f, 0.0f);
 
@@ -167,16 +180,16 @@ void AVICharacter::SpawnInitialPrimaryWeapon()
 			SpawnParams.Owner = this;
 			SpawnParams.Instigator = GetInstigator();
 
-			// 월드에서 액터를 스폰합니다.
-			PrimaryWeapon = World->SpawnActor<AActor>(PrimaryWeaponBpRef, SpawnLocation, SpawnRotation, SpawnParams);
+			// 월드에서 액터를 스폰
+			PrimaryWeapon = Cast<AVIAKWeapon>(World->SpawnActor<AActor>(PrimaryWeaponBpRef, SpawnLocation, SpawnRotation, SpawnParams));
 
 			if (PrimaryWeapon)
 			{
-				// 스폰된 액터에 대해 추가 작업을 수행할 수 있습니다.
+				// 스폰된 액터에 대해 추가 작업을 수행
 				FAttachmentTransformRules AttachmentRules(EAttachmentRule::KeepRelative, true); 
 
 				PrimaryWeapon->AttachToComponent(FirstPersonMesh, AttachmentRules, FName(TEXT("Palm_R")));
-
+				 
 			}
 			else
 			{
@@ -188,13 +201,13 @@ void AVICharacter::SpawnInitialPrimaryWeapon()
 			UE_LOG(LogTemp, Warning, TEXT("MyBlueprintActorClass is null"));
 		}
 	}
+
 }
 
 void AVICharacter::Move(const FInputActionValue& Value)
 {
 	FVector2D MovementVector = Value.Get<FVector2D>();
-	UE_LOG(LogTemp, Log, TEXT("Move"));
-
+	
 	AVIPlayerController* PC = Cast<AVIPlayerController>(GetController());
 
 	// 키 동시입력 제한
@@ -216,8 +229,7 @@ void AVICharacter::Look(const FInputActionValue& Value)
 {
 	// input is a Vector2D
 	FVector2D LookAxisVector = Value.Get<FVector2D>();
-	UE_LOG(LogTemp, Log, TEXT("Look"));
-
+	
 
 
 	if (Controller != nullptr)
@@ -226,4 +238,51 @@ void AVICharacter::Look(const FInputActionValue& Value)
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
 	}
+}
+
+void AVICharacter::Fire()
+{
+	UE_LOG(LogTemp, Log, TEXT("Fire"));
+
+	PrimaryWeapon->Fire();
+
+	if (PrimaryWeapon->GetAmmoCount() > 0)
+	{
+		//Play Montage
+
+		FirstPersonMesh->GetAnimInstance()->Montage_Play(FireActionMontage, 1.0f);
+		
+	}
+
+		
+}
+
+void AVICharacter::Reload()
+{
+
+	if (PrimaryWeapon->GetAmmoCount() < PrimaryWeapon->GetMaxAmmo())
+	{
+		if (!bDoOnceReload && !bIsReloading)
+		{
+			bIsReloading = true;
+
+			FirstPersonMesh->GetAnimInstance()->Montage_Play(ReloadActionMontage,1.0f);
+
+			PrimaryWeapon->Reload();
+
+			FTimerHandle ReloadTimeHandle;
+
+			GetWorld()->GetTimerManager().SetTimer(ReloadTimeHandle, FTimerDelegate::CreateLambda([&]()
+			{
+				bIsReloading = false; 
+			
+				// TimerHandle 초기화
+				GetWorld()->GetTimerManager().ClearTimer(ReloadTimeHandle);
+			}), PrimaryWeapon->GetReloadTime(), false);
+
+
+			bDoOnceReload = false;
+		}
+	}
+
 }

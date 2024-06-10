@@ -15,8 +15,6 @@ public:
 	// Sets default values for this character's properties
 	AVICharacterBase();
 
-
-
 protected:
 
 };

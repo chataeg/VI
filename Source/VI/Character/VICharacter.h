@@ -26,8 +26,8 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	
 	
-
-
+	FORCEINLINE bool GetbIsReloading() { return bIsReloading; };
+	FORCEINLINE TObjectPtr<class UCameraComponent> GetCamera() { return Camera; };
 
 	// Camera Section
 protected:
@@ -44,17 +44,25 @@ protected:
 
 protected:
 	// Weapon Section
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon, Meta = (AllowPrivateAccess = "true"))
+	bool bIsReloading;
+
+	UPROPERTY()
+
+	bool bDoOnceReload;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon , Meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<class AActor> PrimaryWeaponBpRef;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon , Meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class AActor> PrimaryWeapon;
+	TObjectPtr<class AVIAKWeapon> PrimaryWeapon;
 
+	// 블루프린트에서 에셋 지정
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
+	TObjectPtr<class UAnimMontage> FireActionMontage;
 
-
-
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
+	TObjectPtr<class UAnimMontage> ReloadActionMontage;
 
 
 
@@ -74,16 +82,25 @@ protected:
 	TObjectPtr<class UInputAction> LookAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class UInputAction> ShootAction;
+	TObjectPtr<class UInputAction> FireAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction> ReloadAction;
 
 
-
+	// Input Action Functions
 
 	void Move(const FInputActionValue& Value);
 
 	void Look(const FInputActionValue& Value);
 
+	
+	void Fire();
+	
+	void Reload();
 
+
+	// BlueprintCallable Functions
 
 	UFUNCTION(BlueprintCallable)
 	void SetupCharacterControl();
