@@ -41,6 +41,23 @@ AVIWeaponbase::AVIWeaponbase()
 		GunShotWav = GunShotWavRef.Object;
 	}
 
+	static ConstructorHelpers::FObjectFinder<USoundWave> DryFireWavRef(TEXT("/Script/Engine.SoundWave'/Game/WeaponAssets/SoundFX/DryFire.DryFire'"));
+	if (DryFireWavRef.Object)
+	{
+		DryFireWav = DryFireWavRef.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<USoundAttenuation> AKSoundAttenuationRef(TEXT("/Script/Engine.SoundAttenuation'/Game/WeaponAssets/SoundFX/AK_Attenuation.AK_Attenuation'"));
+	if (AKSoundAttenuationRef.Object)
+	{
+		AKSoundAttenuationSettings = AKSoundAttenuationRef.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<USoundConcurrency> AKSoundConcurrencyRef(TEXT("/Script/Engine.SoundConcurrency'/Game/WeaponAssets/SoundFX/AK_Concurrency.AK_Concurrency'"));
+	if (AKSoundConcurrencyRef.Object)
+	{
+		AKSoundConcurrencySettings = AKSoundConcurrencyRef.Object;
+	}
 
 
 	//UE_LOG(LogTemp, Log, TEXT("Weaponbase Constructor"));
@@ -65,6 +82,33 @@ void AVIWeaponbase::Fire()
 	if (AmmoCount > 0)
 	{
 		AmmoCheck();
+	}
+	else
+	{
+		UE_LOG(LogTemp, Log, TEXT("Ammo is Zero"));
+		if (UWorld* World = GetWorld())
+		{
+			APlayerController* PC = UGameplayStatics::GetPlayerController(World, 0);
+
+			if (PC)
+			{
+				AVICharacter* Character = Cast<AVICharacter>(PC->GetCharacter());
+				if (Character)
+				{
+						UGameplayStatics::PlaySoundAtLocation(this,
+							DryFireWav,
+							Character->GetCamera()->GetComponentLocation(),
+							FMath::RandRange(0.7f, 1.2f) + 2.5f,
+							FMath::RandRange(0.7f, 1.2f),
+							0.0f,
+							AKSoundAttenuationSettings,
+							AKSoundConcurrencySettings);
+
+				}
+
+			}
+
+		}
 	}
 }
 
@@ -101,7 +145,14 @@ void AVIWeaponbase::AmmoCheck()
 				{
 					AmmoCount--;
 
-					UGameplayStatics::PlaySoundAtLocation(this, GunShotWav, GetActorLocation(),FMath::RandRange(0.7f,1.2f)+2.5f, FMath::RandRange(0.7f, 1.2f));
+					UGameplayStatics::PlaySoundAtLocation(this, 
+						GunShotWav, 
+						Character->GetCamera()->GetComponentLocation(), 
+						FMath::RandRange(0.7f, 1.2f) + 2.5f, 
+						FMath::RandRange(0.7f, 1.2f),
+						0.0f,	
+						AKSoundAttenuationSettings,
+						AKSoundConcurrencySettings);
 
 					Mesh->PlayAnimation(FireActionAnimation, false);
 					//UE_LOG(LogTemp, Log, TEXT("Fire Animation "));

@@ -56,6 +56,14 @@ protected:
 	UPROPERTY(EditAnywhere)
 	TObjectPtr <class USoundWave> GunShotWav;
 
+	UPROPERTY(EditAnywhere)
+	TObjectPtr <class USoundWave> DryFireWav;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr <class USoundAttenuation> AKSoundAttenuationSettings;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr <class USoundConcurrency> AKSoundConcurrencySettings;
 
 
 

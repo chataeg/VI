@@ -63,7 +63,7 @@ AVICharacter::AVICharacter()
 	}
 	*/
 	
-	static ConstructorHelpers::FClassFinder<AActor> AKWeaponBp(TEXT("/Script/Engine.Blueprint'/Game/VI/Character/Blueprint/BP_AKWeapon.BP_AKWeapon_C'"));
+	static ConstructorHelpers::FClassFinder<AActor> AKWeaponBp(TEXT("/Script/Engine.Blueprint'/Game/VI/Character/Blueprint/Weapon/BP_AKWeapon.BP_AKWeapon_C'"));
 	if (AKWeaponBp.Succeeded())
 	{
 		PrimaryWeaponBpRef = AKWeaponBp.Class;
