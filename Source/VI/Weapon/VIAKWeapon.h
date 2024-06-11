@@ -19,4 +19,9 @@ public:
 	AVIAKWeapon();
 
 
+protected:
+
+
+
+
 };

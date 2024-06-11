@@ -53,6 +53,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Weapon, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UAnimationAsset> ReloadActionAnimation;
 
+	UPROPERTY(EditAnywhere)
+	TObjectPtr <class USoundWave> GunShotWav;
+
+
 
 
 protected:

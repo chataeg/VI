@@ -13,4 +13,6 @@ AVIAKWeapon::AVIAKWeapon()
 
 	//UE_LOG(LogTemp, Log, TEXT("AKWeapon Constructor"));
 
+
+
 }

@@ -4,6 +4,7 @@
 #include "Weapon/VIWeaponbase.h"
 #include "Kismet/GameplayStatics.h"
 #include "Character/VICharacter.h"
+#include "VIAKWeapon.h"
 #include "Player/VIPlayerController.h"
 #include "Camera/CameraComponent.h"
 #include "VI.h"
@@ -33,6 +34,13 @@ AVIWeaponbase::AVIWeaponbase()
 	AmmoCount = 30;
 	ReloadTime = 2.0f;
 	BulletSpread = 500.0f;
+
+	static ConstructorHelpers::FObjectFinder<USoundWave> GunShotWavRef(TEXT("/Script/Engine.SoundWave'/Game/WeaponAssets/SoundFX/Gunshot.Gunshot'"));
+	if (GunShotWavRef.Object)
+	{
+		GunShotWav = GunShotWavRef.Object;
+	}
+
 
 
 	//UE_LOG(LogTemp, Log, TEXT("Weaponbase Constructor"));
@@ -92,8 +100,12 @@ void AVIWeaponbase::AmmoCheck()
 				if (!Character->GetbIsReloading())
 				{
 					AmmoCount--;
+
+					UGameplayStatics::PlaySoundAtLocation(this, GunShotWav, GetActorLocation(),FMath::RandRange(0.7f,1.2f)+2.5f, FMath::RandRange(0.7f, 1.2f));
+
 					Mesh->PlayAnimation(FireActionAnimation, false);
-					UE_LOG(LogTemp, Log, TEXT("Fire Animation "));
+					//UE_LOG(LogTemp, Log, TEXT("Fire Animation "));
+
 					LineTrace();
 				}
 			}
