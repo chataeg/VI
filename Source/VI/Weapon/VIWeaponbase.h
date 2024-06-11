@@ -7,7 +7,7 @@
 #include "Animation/AnimationAsset.h"
 #include "VIWeaponbase.generated.h"
 
-UCLASS()
+UCLASS(Abstract)
 class VI_API AVIWeaponbase : public AActor
 {
 	GENERATED_BODY()
@@ -25,10 +25,10 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION()
-	void Fire();
+	virtual void Fire() PURE_VIRTUAL(AVIWeaponbase::Fire,);
 
 	UFUNCTION()
-	void Reload();
+	virtual void Reload() PURE_VIRTUAL(AVIWeaponbase::Reload, );
 
 	FORCEINLINE int32 GetAmmoCount() const { return AmmoCount; };
 	FORCEINLINE void SetAmmoCount(int32 NewAmmoCount) { AmmoCount = NewAmmoCount; };
@@ -47,23 +47,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class USceneComponent> Muzzle;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Weapon, Meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class UAnimationAsset> FireActionAnimation;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Weapon, Meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class UAnimationAsset> ReloadActionAnimation;
-
-	UPROPERTY(EditAnywhere)
-	TObjectPtr <class USoundWave> GunShotWav;
-
-	UPROPERTY(EditAnywhere)
-	TObjectPtr <class USoundWave> DryFireWav;
-
-	UPROPERTY(EditAnywhere)
-	TObjectPtr <class USoundAttenuation> AKSoundAttenuationSettings;
-
-	UPROPERTY(EditAnywhere)
-	TObjectPtr <class USoundConcurrency> AKSoundConcurrencySettings;
+	
 
 
 
@@ -83,10 +67,10 @@ protected:
 
 	
 	UFUNCTION()
-	void AmmoCheck();
+	virtual void AmmoCheck() PURE_VIRTUAL(AVIWeaponbase::AmmoCheck,);
 
 	UFUNCTION()
-	void LineTrace();
+	virtual void LineTrace() PURE_VIRTUAL(AVIWeaponbase::LineTrace, );
 
 
 
