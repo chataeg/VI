@@ -47,7 +47,19 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class USceneComponent> Muzzle;
 
-	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UPointLightComponent> PointLight;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UStaticMeshComponent> MuzzleFlashMesh;
+
+
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Bullet, Meta = (AllowPricateAccess = "true"))
+	TSubclassOf<class AActor> BulletDecalRef;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Bullet, Meta = (AllowPricateAccess = "true"))
+	TSubclassOf<class AActor> TracerRoundRef;
 
 
 
@@ -69,11 +81,11 @@ protected:
 	UFUNCTION()
 	virtual void AmmoCheck() PURE_VIRTUAL(AVIWeaponbase::AmmoCheck,);
 
-	UFUNCTION()
 	virtual void LineTrace() PURE_VIRTUAL(AVIWeaponbase::LineTrace, );
 
+	virtual void SpawnDecalTracer(FVector Location, FVector SpawnTransformLocation, FVector  ImpactPoint) PURE_VIRTUAL(AVIWeapons::SpawnDecalTracer, );
 
-
+	virtual void MuzzleFlash() PURE_VIRTUAL(AVIWeaponbase::MuzzleFlash, );
 
 
 };

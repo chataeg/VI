@@ -28,6 +28,8 @@ AVITracerRound::AVITracerRound()
 	ProjectileMovement->Bounciness = 0;
 	ProjectileMovement->Friction = 0;
 	ProjectileMovement->InterpLocationTime = 0.05f;
+	ProjectileMovement->ProjectileGravityScale = 0.0f;
+	ProjectileMovement->InitialSpeed = 12000.f;
 
 	StaticMesh->OnComponentHit.AddDynamic(this, &AVITracerRound::OnHitStaticMesh);
 	Sphere->OnComponentHit.AddDynamic(this, &AVITracerRound::OnHitSphere);

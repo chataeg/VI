@@ -181,15 +181,9 @@ void AVICharacter::SpawnInitialPrimaryWeapon()
 				PrimaryWeapon->AttachToComponent(FirstPersonMesh, AttachmentRules, FName(TEXT("Palm_R")));
 				 
 			}
-			else
-			{
-				UE_LOG(LogTemp, Log, TEXT("Failed to attach"));
-			}
+
 		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("MyBlueprintActorClass is null"));
-		}
+	
 	}
 
 }

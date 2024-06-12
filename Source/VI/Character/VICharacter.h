@@ -54,7 +54,6 @@ protected:
 	bool bIsReloading;
 
 	UPROPERTY()
-
 	bool bDoOnceReload;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

@@ -6,6 +6,9 @@
 #include "Character/VICharacter.h"
 #include "Player/VIPlayerController.h"
 #include "Camera/CameraComponent.h"
+#include "Components/PointLightComponent.h"
+#include "Kismet/KismetMathLibrary.h"
+
 
 AVIAKWeapon::AVIAKWeapon()
 {
@@ -119,6 +122,7 @@ void AVIAKWeapon::AmmoCheck()
 				{
 					AmmoCount--;
 
+					/* Play Sound */
 					UGameplayStatics::PlaySoundAtLocation(this,
 						GunShotWav,
 						Character->GetCamera()->GetComponentLocation(),
@@ -129,9 +133,12 @@ void AVIAKWeapon::AmmoCheck()
 						AKSoundConcurrencySettings);
 
 					Mesh->PlayAnimation(FireActionAnimation, false);
-					//UE_LOG(LogTemp, Log, TEXT("Fire Animation "));
 
+
+					/* Start Line Tracing */
 					LineTrace();
+
+
 				}
 			}
 
@@ -152,74 +159,157 @@ void AVIAKWeapon::LineTrace()
 		{
 			AVICharacter* Character = Cast<AVICharacter>(PC->GetCharacter());
 
-			// Camera Linetrace
-
-			FHitResult HitResult;
-			FVector TraceStart = Character->GetCamera()->GetComponentLocation();
-			FVector TraceEnd = Character->GetCamera()->GetForwardVector() * 20000.0f + TraceStart;
-
-			/* ÅºÆÛÁü ¼³Á¤
-
-			FVector BulletSpreadRandVector(
-			FMath::RandRange(BulletSpread * -1.0f, BulletSpread)
-			, FMath::RandRange(BulletSpread * -1.0f, BulletSpread)
-			, FMath::RandRange(BulletSpread * -1.0f, BulletSpread)
-			);
-
-			TraceEnd = TraceEnd + BulletSpreadRandVector;
-
-			*/
-
-			TArray<AActor*> ActorsToIgnore;
-			FColor ColorBeforeHit = FColor::Red;
-			FColor ColorAfterHit = FColor::Green;
-			float ColorsLifeTime = 5.f;
-
-			if (UKismetSystemLibrary::LineTraceSingle(
-				World,
-				TraceStart,
-				TraceEnd,
-				UEngineTypes::ConvertToTraceType(ECC_Visibility),
-				false,
-				ActorsToIgnore,
-				EDrawDebugTrace::ForDuration,
-				HitResult,
-				true,
-				ColorBeforeHit,
-				ColorAfterHit,
-				ColorsLifeTime
-			))
+			if (Character)
 			{
-				// Muzzle Linetrace
 
-				FHitResult HitResultMuzzle;
-				FVector TraceStartMuzzle = Muzzle->GetComponentLocation();
-				FVector TraceEndMuzzle = HitResult.ImpactPoint;
+				// Camera Linetrace
 
-				TArray<AActor*> ActorsToIgnoreMuzzle;
-				FColor ColorBeforeHitMuzzle = FColor::Green;
-				FColor ColorAfterHitMuzzle = FColor::Green;
-				float ColorsLifeTimeMuzzle = 5.f;
+				FHitResult HitResult;
+				FVector TraceStart = Character->GetCamera()->GetComponentLocation();
+				FVector TraceEnd = Character->GetCamera()->GetForwardVector() * 20000.0f + TraceStart;
 
+				/* ÅºÆÛÁü ¼³Á¤
 
-				UKismetSystemLibrary::LineTraceSingle(
+				FVector BulletSpreadRandVector(
+				FMath::RandRange(BulletSpread * -1.0f, BulletSpread)
+				, FMath::RandRange(BulletSpread * -1.0f, BulletSpread)
+				, FMath::RandRange(BulletSpread * -1.0f, BulletSpread)
+				);
+
+				TraceEnd = TraceEnd + BulletSpreadRandVector;
+
+				*/
+
+				TArray<AActor*> ActorsToIgnore;
+				FColor ColorBeforeHit = FColor::Red;
+				FColor ColorAfterHit = FColor::Green;
+				float ColorsLifeTime = 5.f;
+
+				if (UKismetSystemLibrary::LineTraceSingle(
 					World,
-					TraceStartMuzzle,
-					TraceEndMuzzle,
+					TraceStart,
+					TraceEnd,
 					UEngineTypes::ConvertToTraceType(ECC_Visibility),
 					false,
-					ActorsToIgnoreMuzzle,
+					ActorsToIgnore,
 					EDrawDebugTrace::ForDuration,
-					HitResultMuzzle,
+					HitResult,
 					true,
-					ColorBeforeHitMuzzle,
-					ColorAfterHitMuzzle,
-					ColorsLifeTimeMuzzle);
+					ColorBeforeHit,
+					ColorAfterHit,
+					ColorsLifeTime
+				))
+				{
+					// Muzzle Linetrace
+
+					FHitResult HitResultMuzzle;
+					FVector TraceStartMuzzle = Muzzle->GetComponentLocation();
+					FVector TraceEndMuzzle = HitResult.ImpactPoint;
+
+					TArray<AActor*> ActorsToIgnoreMuzzle;
+					FColor ColorBeforeHitMuzzle = FColor::Green;
+					FColor ColorAfterHitMuzzle = FColor::Green;
+					float ColorsLifeTimeMuzzle = 5.f;
+
+					/*
+					UKismetSystemLibrary::LineTraceSingle(
+						World,
+						TraceStartMuzzle,
+						TraceEndMuzzle,
+						UEngineTypes::ConvertToTraceType(ECC_Visibility),
+						false,
+						ActorsToIgnoreMuzzle,
+						EDrawDebugTrace::ForDuration,
+						HitResultMuzzle,
+						true,
+						ColorBeforeHitMuzzle,
+						ColorAfterHitMuzzle,
+						ColorsLifeTimeMuzzle);
+						*/
+					//SpawnDecalTracer(Muzzle->GetComponentLocation(), HitResultMuzzle.ImpactPoint, HitResultMuzzle.ImpactPoint);
+
+
+					SpawnDecalTracer(Muzzle->GetComponentLocation(), HitResult.ImpactPoint, HitResult.ImpactPoint);
+				
+				}
+			
+
+			}
+			
+
+		}
+	}
+	
+	//return TTuple<FVector, FVector>(FVector::ZeroVector, FVector::ZeroVector);
+
+
+}
+
+void AVIAKWeapon::SpawnDecalTracer(FVector Location, FVector SpawnTransformLocation, FVector ImpactPoint)
+{
+	if (UWorld* World = GetWorld())
+	{
+		if (BulletDecalRef != nullptr)
+		{
+			FTransform TFDecal;
+			TFDecal.SetLocation(SpawnTransformLocation);
+			//TFDecal.SetRotation(ImpactPoint.ToOrientationQuat());
+			//TFDecal.SetRotation(UKismetMathLibrary::MakeRotFromX(ImpactPoint).Quaternion());
+			//TFDecal.SetScale3D(FVector(0.025f, 0.025f, 0.025f));
+
+
+
+			AActor* Decal = World->SpawnActor<AActor>(BulletDecalRef, TFDecal);
+			Decal->SetActorScale3D(FVector(0.025f, 0.025f, 0.025f));
+			Decal->SetActorRotation(UKismetMathLibrary::MakeRotFromX(ImpactPoint).Quaternion());
+			
+			if (FMath::RandRange(1, 10) >= 5)
+			{
+				FTransform TF;
+				TF.SetLocation(Location);
+				
+				UCameraComponent* FPPCamera = Cast<AVICharacter>(World->GetFirstPlayerController()->GetCharacter())->GetCamera();
+
+				TF.SetRotation(FPPCamera->GetComponentRotation().Quaternion());
+				TF.SetScale3D(FVector(0.05f, 0.05f, 0.05f));
+				
+				World->SpawnActor<AActor>(TracerRoundRef, TF);
+
 
 
 			}
 
+
+
+			MuzzleFlash();
+
+			return;
 		}
 	}
+
+
+}
+
+void AVIAKWeapon::MuzzleFlash()
+{
+	PointLight->SetIntensity(20000.0f);
+	
+	MuzzleFlashMesh->SetVisibility(true);
+
+	FTimerHandle TimerHandle;
+
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([&](){
+
+		PointLight->SetIntensity(0.0f);
+
+		MuzzleFlashMesh->SetVisibility(false);
+
+	}), 0.1f, false);
+
+	MuzzleFlashMesh->SetRelativeRotation(FRotator(FMath::RandRange(-90.0f,90.0f),90.0f,90.f));
+
+	MuzzleFlashMesh->SetWorldScale3D(FVector(FMath::RandRange(0.2f,0.6f), FMath::RandRange(0.2f, 0.6f), FMath::RandRange(0.2f, 0.6f)));
+
+
 
 }

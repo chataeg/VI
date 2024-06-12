@@ -18,11 +18,12 @@ public:
 
 	AVIAKWeapon();
 
-
 	virtual void Fire() override;
 	virtual void Reload() override;
 	virtual void AmmoCheck() override;
 	virtual void LineTrace() override;
+	virtual void SpawnDecalTracer(FVector Location, FVector SpawnTransformLocation, FVector  ImpactPoint) override;
+	virtual void MuzzleFlash() override;
 
 protected:
 
