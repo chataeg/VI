@@ -16,7 +16,7 @@ AVIAKWeapon::AVIAKWeapon()
 	MaxAmmo = 30;
 	AmmoCount = 30;
 	ReloadTime = 2.0f;
-	BulletSpread = 500.0f;
+	BulletSpread = 2000.0f;
 
 	//UE_LOG(LogTemp, Log, TEXT("AKWeapon Constructor"));
 
@@ -168,18 +168,25 @@ void AVIAKWeapon::LineTrace()
 				FVector TraceStart = Character->GetCamera()->GetComponentLocation();
 				FVector TraceEnd = Character->GetCamera()->GetForwardVector() * 20000.0f + TraceStart;
 
-				/* ÅºÆÛÁü ¼³Á¤
+				
+				/* Bullet Spread */
 
-				FVector BulletSpreadRandVector(
-				FMath::RandRange(BulletSpread * -1.0f, BulletSpread)
-				, FMath::RandRange(BulletSpread * -1.0f, BulletSpread)
-				, FMath::RandRange(BulletSpread * -1.0f, BulletSpread)
-				);
+				if (Character->GetVelocity().Length() > 20.0f)
+				{
+					FVector BulletSpreadRandVector(
+						FMath::RandRange(BulletSpread * -1.0f, BulletSpread)
+						, FMath::RandRange(BulletSpread * -1.0f, BulletSpread)
+						, FMath::RandRange(BulletSpread * -1.0f, BulletSpread)
+					);
 
-				TraceEnd = TraceEnd + BulletSpreadRandVector;
+					TraceEnd = TraceEnd + BulletSpreadRandVector;
 
-				*/
+				}
 
+				
+
+
+				
 				TArray<AActor*> ActorsToIgnore;
 				FColor ColorBeforeHit = FColor::Red;
 				FColor ColorAfterHit = FColor::Green;
@@ -263,14 +270,22 @@ void AVIAKWeapon::SpawnDecalTracer(FVector Location, FVector SpawnTransformLocat
 			Decal->SetActorScale3D(FVector(0.025f, 0.025f, 0.025f));
 			Decal->SetActorRotation(UKismetMathLibrary::MakeRotFromX(ImpactPoint).Quaternion());
 			
-			if (FMath::RandRange(1, 10) >= 5)
+			if (FMath::RandRange(1, 10) >= 0)
 			{
 				FTransform TF;
 				TF.SetLocation(Location);
 				
+				FVector Direction = ImpactPoint - Location;
+				Direction.Normalize();
+				FRotator TracerRotation = Direction.Rotation();
+
+
 				UCameraComponent* FPPCamera = Cast<AVICharacter>(World->GetFirstPlayerController()->GetCharacter())->GetCamera();
 
-				TF.SetRotation(FPPCamera->GetComponentRotation().Quaternion());
+				
+
+				TF.SetRotation(TracerRotation.Quaternion());
+				//TF.SetRotation(FPPCamera->GetComponentRotation().Quaternion());
 				TF.SetScale3D(FVector(0.05f, 0.05f, 0.05f));
 				
 				World->SpawnActor<AActor>(TracerRoundRef, TF);

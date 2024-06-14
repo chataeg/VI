@@ -228,6 +228,8 @@ void AVICharacter::Fire()
 {
 	UE_LOG(LogTemp, Log, TEXT("Fire"));
 
+	if (bIsReloading) return;
+
 	PrimaryWeapon->Fire();
 
 	if (PrimaryWeapon->GetAmmoCount() > 0)
