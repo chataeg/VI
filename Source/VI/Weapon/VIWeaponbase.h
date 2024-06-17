@@ -7,6 +7,8 @@
 #include "Animation/AnimationAsset.h"
 #include "VIWeaponbase.generated.h"
 
+
+/* 무기들의 기본 뼈대가 되는 추상 베이스 클래스 */
 UCLASS(Abstract)
 class VI_API AVIWeaponbase : public AActor
 {
@@ -16,13 +18,7 @@ public:
 	// Sets default values for this actor's properties
 	AVIWeaponbase();
 
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
 public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION()
 	virtual void Fire() PURE_VIRTUAL(AVIWeaponbase::Fire,);
@@ -53,12 +49,10 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UStaticMeshComponent> MuzzleFlashMesh;
 
-
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Bullet, Meta = (AllowPricateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Bullet)
 	TSubclassOf<class AActor> BulletDecalRef;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Bullet, Meta = (AllowPricateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Bullet)
 	TSubclassOf<class AActor> TracerRoundRef;
 
 
@@ -77,14 +71,16 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Meta = (AllowPrivateAccess = "true"))
 	int32 MaxAmmo;
 
-	
 	UFUNCTION()
 	virtual void AmmoCheck() PURE_VIRTUAL(AVIWeaponbase::AmmoCheck,);
 
+	UFUNCTION()
 	virtual void LineTrace() PURE_VIRTUAL(AVIWeaponbase::LineTrace, );
 
+	UFUNCTION()
 	virtual void SpawnDecalTracer(FVector Location, FVector SpawnTransformLocation, FVector  ImpactPoint) PURE_VIRTUAL(AVIWeapons::SpawnDecalTracer, );
 
+	UFUNCTION()
 	virtual void MuzzleFlash() PURE_VIRTUAL(AVIWeaponbase::MuzzleFlash, );
 
 

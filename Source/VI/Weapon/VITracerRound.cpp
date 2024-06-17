@@ -12,8 +12,6 @@ AVITracerRound::AVITracerRound()
 
 	Sphere->SetupAttachment(RootComponent);
 
-	
-
 	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
 
 	StaticMesh->SetupAttachment(Sphere);
@@ -28,28 +26,24 @@ AVITracerRound::AVITracerRound()
 	ProjectileMovement->Bounciness = 0;
 	ProjectileMovement->Friction = 0;
 	ProjectileMovement->InterpLocationTime = 0.05f;
+	
+	// 일직선으로 총알을 날려보내기 위해 0.0f로 설정
 	ProjectileMovement->ProjectileGravityScale = 0.0f;
 	ProjectileMovement->InitialSpeed = 12000.f;
 
 	StaticMesh->OnComponentHit.AddDynamic(this, &AVITracerRound::OnHitStaticMesh);
 	Sphere->OnComponentHit.AddDynamic(this, &AVITracerRound::OnHitSphere);
 
-	
-
-
 }
 
 void AVITracerRound::OnHitStaticMesh( UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	Destroy();
-	
-
 }
 
 void AVITracerRound::OnHitSphere(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	Destroy();
-
 }
 
 

@@ -18,8 +18,7 @@ AVIAKWeapon::AVIAKWeapon()
 	ReloadTime = 2.0f;
 	BulletSpread = 2000.0f;
 
-	//UE_LOG(LogTemp, Log, TEXT("AKWeapon Constructor"));
-
+	
 
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> AK_RiggedRef(TEXT("/Script/Engine.SkeletalMesh'/Game/WeaponAssets/RiggedMeshes/AK_rigged.AK_rigged'"));
 	if (AK_RiggedRef.Object != nullptr)
@@ -152,7 +151,6 @@ void AVIAKWeapon::LineTrace()
 {
 	if (UWorld* World = GetWorld())
 	{
-		// Get the player controller for the first player (index 0)
 		APlayerController* PC = UGameplayStatics::GetPlayerController(World, 0);
 
 		if (PC)
@@ -184,9 +182,6 @@ void AVIAKWeapon::LineTrace()
 				}
 
 				
-
-
-				
 				TArray<AActor*> ActorsToIgnore;
 				FColor ColorBeforeHit = FColor::Red;
 				FColor ColorAfterHit = FColor::Green;
@@ -208,7 +203,7 @@ void AVIAKWeapon::LineTrace()
 				))
 				{
 					// Muzzle Linetrace
-
+					/*
 					FHitResult HitResultMuzzle;
 					FVector TraceStartMuzzle = Muzzle->GetComponentLocation();
 					FVector TraceEndMuzzle = HitResult.ImpactPoint;
@@ -218,7 +213,7 @@ void AVIAKWeapon::LineTrace()
 					FColor ColorAfterHitMuzzle = FColor::Green;
 					float ColorsLifeTimeMuzzle = 5.f;
 
-					/*
+					
 					UKismetSystemLibrary::LineTraceSingle(
 						World,
 						TraceStartMuzzle,
@@ -232,12 +227,12 @@ void AVIAKWeapon::LineTrace()
 						ColorBeforeHitMuzzle,
 						ColorAfterHitMuzzle,
 						ColorsLifeTimeMuzzle);
-						*/
+					
 					//SpawnDecalTracer(Muzzle->GetComponentLocation(), HitResultMuzzle.ImpactPoint, HitResultMuzzle.ImpactPoint);
 
-
+					*/
 					SpawnDecalTracer(Muzzle->GetComponentLocation(), HitResult.ImpactPoint, HitResult.ImpactPoint);
-				
+					
 				}
 			
 
@@ -260,11 +255,6 @@ void AVIAKWeapon::SpawnDecalTracer(FVector Location, FVector SpawnTransformLocat
 		{
 			FTransform TFDecal;
 			TFDecal.SetLocation(SpawnTransformLocation);
-			//TFDecal.SetRotation(ImpactPoint.ToOrientationQuat());
-			//TFDecal.SetRotation(UKismetMathLibrary::MakeRotFromX(ImpactPoint).Quaternion());
-			//TFDecal.SetScale3D(FVector(0.025f, 0.025f, 0.025f));
-
-
 
 			AActor* Decal = World->SpawnActor<AActor>(BulletDecalRef, TFDecal);
 			Decal->SetActorScale3D(FVector(0.025f, 0.025f, 0.025f));
@@ -280,21 +270,12 @@ void AVIAKWeapon::SpawnDecalTracer(FVector Location, FVector SpawnTransformLocat
 				FRotator TracerRotation = Direction.Rotation();
 
 
-				UCameraComponent* FPPCamera = Cast<AVICharacter>(World->GetFirstPlayerController()->GetCharacter())->GetCamera();
-
-				
-
 				TF.SetRotation(TracerRotation.Quaternion());
-				//TF.SetRotation(FPPCamera->GetComponentRotation().Quaternion());
 				TF.SetScale3D(FVector(0.05f, 0.05f, 0.05f));
 				
 				World->SpawnActor<AActor>(TracerRoundRef, TF);
 
-
-
 			}
-
-
 
 			MuzzleFlash();
 
@@ -324,7 +305,6 @@ void AVIAKWeapon::MuzzleFlash()
 	MuzzleFlashMesh->SetRelativeRotation(FRotator(FMath::RandRange(-90.0f,90.0f),90.0f,90.f));
 
 	MuzzleFlashMesh->SetWorldScale3D(FVector(FMath::RandRange(0.2f,0.6f), FMath::RandRange(0.2f, 0.6f), FMath::RandRange(0.2f, 0.6f)));
-
 
 
 }

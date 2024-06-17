@@ -10,7 +10,10 @@
 #include "EnhancedInputSubsystems.h"
 #include "Weapon/VIWeaponbase.h"
 #include "Weapon/VIAKWeapon.h"
+#include "Weapon/VIGlockWeapon.h"
 #include "VI/Player/VIPlayerController.h"
+#include "VI.h"
+
 
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/PostProcessComponent.h"
@@ -33,6 +36,7 @@ AVICharacter::AVICharacter()
 
 	bIsReloading = false;
 	bDoOnceReload = false;
+	bEquippedWeapon = true;
 	Health = 100;
 
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> FirstPersonMeshRef(TEXT("/Script/Engine.SkeletalMesh'/Game/WeaponAssets/RiggedMeshes/FPSArms_rigged.FPSArms_rigged'"));
@@ -62,11 +66,20 @@ AVICharacter::AVICharacter()
 
 	}
 	*/
+
+
+	// Constructor Section
 	
 	static ConstructorHelpers::FClassFinder<AActor> AKWeaponBp(TEXT("/Script/Engine.Blueprint'/Game/VI/Character/Blueprint/Weapon/BP_AKWeapon.BP_AKWeapon_C'"));
 	if (AKWeaponBp.Succeeded())
 	{
 		PrimaryWeaponBpRef = AKWeaponBp.Class;
+	}
+	
+	static ConstructorHelpers::FClassFinder<AActor> GlockWeaponBp(TEXT("/Script/Engine.Blueprint'/Game/VI/Character/Blueprint/Weapon/BP_GlockWeapon.BP_GlockWeapon_C'"));
+	if (GlockWeaponBp.Succeeded())
+	{
+		SecondaryWeaponBpRef = GlockWeaponBp.Class;
 	}
 
 
@@ -105,6 +118,18 @@ AVICharacter::AVICharacter()
 	{
 		ReloadAction = InputActionReloadRef.Object;
 	}
+	
+	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionEquipFirstRef(TEXT("/Script/EnhancedInput.InputAction'/Game/VI/Character/Input/Actions/IA_EquipFirst.IA_EquipFirst'"));
+	if (nullptr != InputActionEquipFirstRef.Object)
+	{
+		EquipFirstAction = InputActionEquipFirstRef.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionEquipSecondRef(TEXT("/Script/EnhancedInput.InputAction'/Game/VI/Character/Input/Actions/IA_EquipSecond.IA_EquipSecond'"));
+	if (nullptr != InputActionEquipSecondRef.Object)
+	{
+		EquipSecondAction = InputActionEquipSecondRef.Object;
+	}
 
 
 	
@@ -115,9 +140,7 @@ void AVICharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// 
-
-	
+	/* 블루프린트에서 SetUpCharacterControl - SpawnInitialPrimaryWeapon 호출됩니다. */
 }
 
 void AVICharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -133,6 +156,12 @@ void AVICharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 	EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this, &AVICharacter::Fire);
 	EnhancedInputComponent->BindAction(ReloadAction, ETriggerEvent::Triggered, this, &AVICharacter::Reload);
+
+	EnhancedInputComponent->BindAction(EquipFirstAction, ETriggerEvent::Triggered, this, &AVICharacter::EquipFirst);
+	EnhancedInputComponent->BindAction(EquipSecondAction, ETriggerEvent::Triggered, this, &AVICharacter::EquipSecond);
+
+
+
 
 
 }
@@ -183,6 +212,33 @@ void AVICharacter::SpawnInitialPrimaryWeapon()
 			}
 
 		}
+
+		if (SecondaryWeaponBpRef != nullptr)
+		{
+			// 스폰할 위치와 회전을 지정
+			FVector SpawnLocation = FVector(0.0f, 0.0f, 0.0f);
+			FRotator SpawnRotation = FRotator(0.0f, 0.0f, 0.0f);
+
+			// 액터 스폰 파라미터 설정
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.Owner = this;
+			SpawnParams.Instigator = GetInstigator();
+
+			// 월드에서 액터를 스폰
+			SecondaryWeapon = Cast<AVIGlockWeapon>(World->SpawnActor<AActor>(SecondaryWeaponBpRef, SpawnLocation, SpawnRotation, SpawnParams));
+
+			if (SecondaryWeapon)
+			{
+				// 스폰된 액터에 대해 추가 작업을 수행
+				FAttachmentTransformRules AttachmentRules(EAttachmentRule::KeepRelative, true);
+
+				SecondaryWeapon->AttachToComponent(FirstPersonMesh, AttachmentRules, FName(TEXT("Palm_R")));
+				
+				SecondaryWeapon->GetRootComponent()->SetVisibility(false);
+			}
+
+		}
+
 	
 	}
 
@@ -230,45 +286,124 @@ void AVICharacter::Fire()
 
 	if (bIsReloading) return;
 
-	PrimaryWeapon->Fire();
-
-	if (PrimaryWeapon->GetAmmoCount() > 0)
+	if (bEquippedWeapon)
 	{
-		//Play Montage
+		PrimaryWeapon->Fire();
 
-		FirstPersonMesh->GetAnimInstance()->Montage_Play(FireActionMontage, 1.0f);
-		
+		if (PrimaryWeapon->GetAmmoCount() > 0)
+		{
+			//Play Montage
+
+			FirstPersonMesh->GetAnimInstance()->Montage_Play(AKFireActionMontage, 1.0f);
+
+		}
 	}
+	else
+	{
+		SecondaryWeapon->Fire();
+
+		if (SecondaryWeapon->GetAmmoCount() > 0)
+		{
+			//Play Montage
+			D("FireArmMontage")
+			FirstPersonMesh->GetAnimInstance()->Montage_Play(GlockFireActionMontage, 1.0f);
+
+		}
+
+
+	}
+
+	
 
 		
 }
 
 void AVICharacter::Reload()
 {
-
-	if (PrimaryWeapon->GetAmmoCount() < PrimaryWeapon->GetMaxAmmo())
+	if (bEquippedWeapon)
 	{
-		if (!bDoOnceReload && !bIsReloading)
+		if (PrimaryWeapon->GetAmmoCount() < PrimaryWeapon->GetMaxAmmo())
 		{
-			bIsReloading = true;
-
-			FirstPersonMesh->GetAnimInstance()->Montage_Play(ReloadActionMontage,1.0f);
-
-			PrimaryWeapon->Reload();
-
-			FTimerHandle ReloadTimeHandle;
-
-			GetWorld()->GetTimerManager().SetTimer(ReloadTimeHandle, FTimerDelegate::CreateLambda([&]()
+			if (!bDoOnceReload && !bIsReloading)
 			{
-				bIsReloading = false; 
-			
-				// TimerHandle 초기화
-				GetWorld()->GetTimerManager().ClearTimer(ReloadTimeHandle);
-			}), PrimaryWeapon->GetReloadTime(), false);
+				bIsReloading = true;
+
+				FirstPersonMesh->GetAnimInstance()->Montage_Play(AKReloadActionMontage, 1.0f);
+
+				PrimaryWeapon->Reload();
+
+				FTimerHandle ReloadTimeHandle;
+
+				GetWorld()->GetTimerManager().SetTimer(ReloadTimeHandle, FTimerDelegate::CreateLambda([&]()
+				{
+					bIsReloading = false;
+
+					// TimerHandle 초기화
+					GetWorld()->GetTimerManager().ClearTimer(ReloadTimeHandle);
+				}), PrimaryWeapon->GetReloadTime(), false);
 
 
-			bDoOnceReload = false;
+				bDoOnceReload = false;
+			}
 		}
+	}
+	else
+	{
+		if (SecondaryWeapon->GetAmmoCount() < SecondaryWeapon->GetMaxAmmo())
+		{
+			if (!bDoOnceReload && !bIsReloading)
+			{
+				bIsReloading = true;
+
+				FirstPersonMesh->GetAnimInstance()->Montage_Play(GlockReloadActionMontage, 1.0f);
+
+				SecondaryWeapon->Reload();
+
+				FTimerHandle ReloadTimeHandle;
+
+				GetWorld()->GetTimerManager().SetTimer(ReloadTimeHandle, FTimerDelegate::CreateLambda([&]()
+				{
+					bIsReloading = false;
+
+					// TimerHandle 초기화
+					GetWorld()->GetTimerManager().ClearTimer(ReloadTimeHandle);
+				}), SecondaryWeapon->GetReloadTime(), false);
+
+
+				bDoOnceReload = false;
+			}
+		}
+	}
+	
+
+}
+
+void AVICharacter::EquipFirst()
+{
+	if (!bIsReloading)
+	{
+		D("EquipFirst")
+		bEquippedWeapon = true;
+
+		PrimaryWeapon->GetRootComponent()->SetVisibility(true);
+		SecondaryWeapon->GetRootComponent()->SetVisibility(false);
+
+
+	}
+
+}
+
+void AVICharacter::EquipSecond()
+{
+	if (!bIsReloading)
+	{
+		D("EquipSecond")
+		bEquippedWeapon = false;
+
+		PrimaryWeapon->GetRootComponent()->SetVisibility(false);
+		SecondaryWeapon->GetRootComponent()->SetVisibility(true);
+
+
 	}
 
 }

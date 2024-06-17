@@ -7,16 +7,12 @@
 #include "InputActionValue.h"
 #include "VICharacter.generated.h"
 
-/**
- * 
- */
+/* 캐릭터 클래스 */
 UCLASS()
 class VI_API AVICharacter : public AVICharacterBase
 {
 	GENERATED_BODY()
 	
-
-
 public:
 	AVICharacter();
 
@@ -48,13 +44,18 @@ protected:
 	TObjectPtr <class UPostProcessComponent> PostProcessComponent;
 	
 
-protected:
 	// Weapon Section
+
+protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon, Meta = (AllowPrivateAccess = "true"))
 	bool bIsReloading;
 
 	UPROPERTY()
 	bool bDoOnceReload;
+
+
+	UPROPERTY(VisibleAnywhere,BlueprintReadWrite, Meta = (AllowPrivateAccess = "true"))
+	bool bEquippedWeapon;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 
@@ -67,12 +68,27 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon , Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class AVIAKWeapon> PrimaryWeapon;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon, Meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<class AActor> SecondaryWeaponBpRef;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class AVIGlockWeapon> SecondaryWeapon;
+
+
 	// 블루프린트에서 에셋 지정
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
-	TObjectPtr<class UAnimMontage> FireActionMontage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
-	TObjectPtr<class UAnimMontage> ReloadActionMontage;
+	TObjectPtr<class UAnimMontage> AKFireActionMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
+	TObjectPtr<class UAnimMontage> AKReloadActionMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
+	TObjectPtr<class UAnimMontage> GlockFireActionMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
+	TObjectPtr<class UAnimMontage> GlockReloadActionMontage;
+
 
 
 
@@ -97,6 +113,13 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> ReloadAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction> EquipFirstAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction> EquipSecondAction;
+
+
 
 	// Input Action Functions
 
@@ -104,10 +127,14 @@ protected:
 
 	void Look(const FInputActionValue& Value);
 
-	
 	void Fire();
 	
 	void Reload();
+
+	void EquipFirst();
+
+	void EquipSecond();
+
 
 
 	// BlueprintCallable Functions

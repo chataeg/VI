@@ -17,15 +17,12 @@ AVIWeaponbase::AVIWeaponbase()
 {
  	
 	Mesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("PrimaryWeapon"));
-	
 	Mesh->SetupAttachment(RootComponent);
 
-	
-
 	Muzzle = CreateDefaultSubobject<USceneComponent>(TEXT("Muzzle"));
-	
 	Muzzle->SetupAttachment(Mesh);
 	Muzzle->SetRelativeLocation(FVector(62.f, -0.98f, 10.13f));
+
 
 	PointLight = CreateDefaultSubobject<UPointLightComponent>(TEXT("PointLight"));
 	PointLight->SetupAttachment(Mesh);
@@ -37,17 +34,12 @@ AVIWeaponbase::AVIWeaponbase()
 	MuzzleFlashMesh->SetRelativeRotation(FRotator(-90.f,0.0f,0.0f));
 	MuzzleFlashMesh->SetRelativeScale3D(FVector(0.6f, 0.6f, 0.6f));
 	MuzzleFlashMesh->SetRelativeLocation(FVector(74.9f, 0.0f, 9.75f));
-
-
-
-
 	
-	
-	
+
 	MaxAmmo = 30;
 	AmmoCount = 30;
 	ReloadTime = 2.0f;
-	BulletSpread = 500.0f;
+	BulletSpread = 2000.0f;
 
 
 
@@ -65,20 +57,6 @@ AVIWeaponbase::AVIWeaponbase()
 		TracerRoundRef = TracerRoundBpRef.Class;
 	}
 
-	//UE_LOG(LogTemp, Log, TEXT("Weaponbase Constructor"));
-}
-
-// Called when the game starts or when spawned
-void AVIWeaponbase::BeginPlay()
-{
-	Super::BeginPlay();
-	
-}
-
-// Called every frame
-void AVIWeaponbase::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
 
 }
 

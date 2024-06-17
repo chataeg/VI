@@ -12,7 +12,6 @@ AVIGameMode::AVIGameMode()
 		DefaultPawnClass = DefaultPawnClassRef.Class;
 	}
 
-
 	static ConstructorHelpers::FClassFinder<APlayerController> PlayerControllerClassRef(TEXT("/Script/CoreUObject.Class'/Script/VI.VIPlayerController'"));
 	if (PlayerControllerClassRef.Class)
 	{
