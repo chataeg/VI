@@ -5,7 +5,11 @@
 #include "CoreMinimal.h"
 #include "Character/VICharacterBase.h"
 #include "InputActionValue.h"
+#include "Components/TimelineComponent.h"
 #include "VICharacter.generated.h"
+
+
+DECLARE_DELEGATE_OneParam(FBindActionParam, const float);
 
 /* 캐릭터 클래스 */
 UCLASS()
@@ -22,6 +26,8 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	
 	
+
+
 	FORCEINLINE bool GetbIsReloading() { return bIsReloading; };
 	FORCEINLINE TObjectPtr<class UCameraComponent> GetCamera() { return Camera; };
 
@@ -57,8 +63,13 @@ protected:
 	UPROPERTY(VisibleAnywhere,BlueprintReadWrite, Meta = (AllowPrivateAccess = "true"))
 	bool bEquippedWeapon;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess = "true"))
+	bool bADS;
+
+
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 Health;
 
 
@@ -81,13 +92,23 @@ protected:
 	TObjectPtr<class UAnimMontage> AKFireActionMontage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
+	TObjectPtr<class UAnimMontage> AKADSFireActionMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
 	TObjectPtr<class UAnimMontage> AKReloadActionMontage;
+
+
+
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
 	TObjectPtr<class UAnimMontage> GlockFireActionMontage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
+	TObjectPtr<class UAnimMontage> GlockADSFireActionMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
 	TObjectPtr<class UAnimMontage> GlockReloadActionMontage;
+
 
 
 
@@ -118,6 +139,23 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> EquipSecondAction;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction> ADSAction;
+
+
+	// TimeLine Section
+
+
+	FOnTimelineFloat ADSCallback;
+	FOnTimelineEvent ADSTimelineFinish;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Timeline)
+	TObjectPtr<class UTimelineComponent> ADSTimeline;
+
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category = Timeline)
+	TObjectPtr<class UCurveFloat> ADSCurve;
+
 
 
 
@@ -134,6 +172,16 @@ protected:
 	void EquipFirst();
 
 	void EquipSecond();
+
+
+	UFUNCTION()
+	void ADSTimeLineFunc(float value);
+
+	UFUNCTION()
+	void StartADS();
+	
+
+
 
 
 

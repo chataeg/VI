@@ -3,20 +3,24 @@
 
 #include "Character/VICharacter.h"
 
-#include "Camera/CameraComponent.h"
-#include "GameFramework/SpringArmComponent.h"
 #include "InputMappingContext.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+
 #include "Weapon/VIWeaponbase.h"
 #include "Weapon/VIAKWeapon.h"
 #include "Weapon/VIGlockWeapon.h"
+
 #include "VI/Player/VIPlayerController.h"
 #include "VI.h"
 
-
+#include "Components/TimelineComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/PostProcessComponent.h"
+#include "Camera/CameraComponent.h"
+#include "GameFramework/SpringArmComponent.h"
+
+
 
 AVICharacter::AVICharacter()
 {
@@ -37,6 +41,8 @@ AVICharacter::AVICharacter()
 	bIsReloading = false;
 	bDoOnceReload = false;
 	bEquippedWeapon = true;
+	bADS = false;
+
 	Health = 100;
 
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> FirstPersonMeshRef(TEXT("/Script/Engine.SkeletalMesh'/Game/WeaponAssets/RiggedMeshes/FPSArms_rigged.FPSArms_rigged'"));
@@ -66,6 +72,16 @@ AVICharacter::AVICharacter()
 
 	}
 	*/
+
+
+	// Timeline Section
+
+
+	ADSTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("ADSTimeline"));
+	ADSCallback.BindUFunction(this, FName("ADSTimeLineFunc"));
+	//ADSTimelineFinish.BindUFunction(this, FName("EndADS"));
+	
+
 
 
 	// Constructor Section
@@ -131,7 +147,19 @@ AVICharacter::AVICharacter()
 		EquipSecondAction = InputActionEquipSecondRef.Object;
 	}
 
+	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionADSActionRef(TEXT("/Script/EnhancedInput.InputAction'/Game/VI/Character/Input/Actions/IA_ADS.IA_ADS'"));
+	if (nullptr != InputActionADSActionRef.Object)
+	{
+		ADSAction = InputActionADSActionRef.Object;
+	}
 
+
+
+	static ConstructorHelpers::FObjectFinder<UCurveFloat> ADSCurveRef(TEXT("/Script/Engine.CurveFloat'/Game/VI/Character/Blueprint/Curve/Curve_ADS.Curve_ADS'"));
+	if (nullptr != ADSCurveRef.Object)
+	{
+		ADSCurve = ADSCurveRef.Object;
+	}
 	
 
 }
@@ -141,6 +169,15 @@ void AVICharacter::BeginPlay()
 	Super::BeginPlay();
 
 	/* 블루프린트에서 SetUpCharacterControl - SpawnInitialPrimaryWeapon 호출됩니다. */
+
+	// Timeline
+	
+	ADSTimeline->AddInterpFloat(ADSCurve, ADSCallback);
+	ADSTimeline->SetTimelineLength(0.15f);
+	ADSTimeline->SetLooping(false);
+
+
+
 }
 
 void AVICharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -159,6 +196,10 @@ void AVICharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 	EnhancedInputComponent->BindAction(EquipFirstAction, ETriggerEvent::Triggered, this, &AVICharacter::EquipFirst);
 	EnhancedInputComponent->BindAction(EquipSecondAction, ETriggerEvent::Triggered, this, &AVICharacter::EquipSecond);
+
+	EnhancedInputComponent->BindAction(ADSAction, ETriggerEvent::Triggered, this, &AVICharacter::StartADS);
+	
+	//EnhancedInputComponent->BindAction(ADSAction, ETriggerEvent::Completed, this, &AVICharacter::EndADS);
 
 
 
@@ -288,34 +329,41 @@ void AVICharacter::Fire()
 
 	if (bEquippedWeapon)
 	{
-		PrimaryWeapon->Fire();
-
+	
 		if (PrimaryWeapon->GetAmmoCount() > 0)
 		{
-			//Play Montage
+			
+			PrimaryWeapon->Fire();
 
-			FirstPersonMesh->GetAnimInstance()->Montage_Play(AKFireActionMontage, 1.0f);
+			//Play Montage
+			if (bADS)
+			{
+				FirstPersonMesh->GetAnimInstance()->Montage_Play(AKADSFireActionMontage, 1.0f);
+			}
+			else
+			{
+				FirstPersonMesh->GetAnimInstance()->Montage_Play(AKFireActionMontage, 1.0f);
+			}
 
 		}
 	}
 	else
 	{
-		SecondaryWeapon->Fire();
-
+		
 		if (SecondaryWeapon->GetAmmoCount() > 0)
 		{
-			//Play Montage
-			D("FireArmMontage")
-			FirstPersonMesh->GetAnimInstance()->Montage_Play(GlockFireActionMontage, 1.0f);
+			SecondaryWeapon->Fire();
 
+			if (bADS)
+			{
+				FirstPersonMesh->GetAnimInstance()->Montage_Play(GlockADSFireActionMontage, 1.0f);
+			}
+			else
+			{
+				FirstPersonMesh->GetAnimInstance()->Montage_Play(GlockFireActionMontage, 1.0f);
+			}
 		}
-
-
 	}
-
-	
-
-		
 }
 
 void AVICharacter::Reload()
@@ -374,21 +422,16 @@ void AVICharacter::Reload()
 			}
 		}
 	}
-	
-
 }
 
 void AVICharacter::EquipFirst()
 {
 	if (!bIsReloading)
 	{
-		D("EquipFirst")
+	
 		bEquippedWeapon = true;
-
 		PrimaryWeapon->GetRootComponent()->SetVisibility(true);
 		SecondaryWeapon->GetRootComponent()->SetVisibility(false);
-
-
 	}
 
 }
@@ -397,13 +440,50 @@ void AVICharacter::EquipSecond()
 {
 	if (!bIsReloading)
 	{
-		D("EquipSecond")
+	
 		bEquippedWeapon = false;
-
 		PrimaryWeapon->GetRootComponent()->SetVisibility(false);
 		SecondaryWeapon->GetRootComponent()->SetVisibility(true);
+	}
 
+}
+
+void AVICharacter::ADSTimeLineFunc(float value)
+{
+	D("TimeLine")
+	if (bEquippedWeapon)
+	{
+		GetCamera()->SetFieldOfView(FMath::Lerp(90.0f, 45.0f, value));
+		FirstPersonMesh->SetRelativeLocation(FMath::Lerp(FVector(1.6f, 7.8f, -23.6f), FVector(1.6f, 0.0f, -16.5f), value));
+		FirstPersonMesh->SetRelativeRotation(FRotator(0.0f, -1.0f, 0.0f));
 
 	}
+	else
+	{
+		GetCamera()->SetFieldOfView(FMath::Lerp(90.0f, 45.0f, value));
+		FirstPersonMesh->SetRelativeLocation(FMath::Lerp(FVector(1.6f, 7.8f, -23.6f), FVector(1.6f, 0.0f, -16.0f), value));
+		FirstPersonMesh->SetRelativeRotation(FRotator(0.0f, -1.0f, 0.0f));
+
+	}
+		
+	
+}
+
+void AVICharacter::StartADS()
+{
+	if (!bADS)
+	{
+		D("StartADS")
+			bADS = true;
+		ADSTimeline->Play();
+
+	}
+	else
+	{
+		D("EndADS")
+			bADS = false;
+		ADSTimeline->ReverseFromEnd();
+	}
+	
 
 }

@@ -31,9 +31,6 @@ public:
 	
 	virtual void MuzzleFlash() override;
 
-protected:
-
-
 	// Asset Section
 
 protected:

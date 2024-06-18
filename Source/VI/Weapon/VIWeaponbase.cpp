@@ -41,10 +41,6 @@ AVIWeaponbase::AVIWeaponbase()
 	ReloadTime = 2.0f;
 	BulletSpread = 2000.0f;
 
-
-
-
-
 	static ConstructorHelpers::FClassFinder<AActor> BulletDecalBpRef(TEXT("/Script/Engine.Blueprint'/Game/VI/Character/Blueprint/Weapon/BP_BulletDecal.BP_BulletDecal_C'"));
 	if (BulletDecalBpRef.Class)
 	{
