@@ -9,6 +9,8 @@
 #include "Components/PointLightComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 
+#include "VI.h"
+
 
 AVIAKWeapon::AVIAKWeapon()
 {
@@ -17,7 +19,9 @@ AVIAKWeapon::AVIAKWeapon()
 	AmmoCount = 30;
 	ReloadTime = 2.0f;
 	BulletSpread = 2000.0f;
+	AimOffset = FVector(0.0f, 0.0f, -2.0f);
 
+	
 	
 
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> AK_RiggedRef(TEXT("/Script/Engine.SkeletalMesh'/Game/WeaponAssets/RiggedMeshes/AK_rigged.AK_rigged'"));
@@ -55,13 +59,17 @@ AVIAKWeapon::AVIAKWeapon()
 
 void AVIAKWeapon::Fire()
 {
+	Super::Fire();
+
 	if (AmmoCount > 0)
 	{
 		AmmoCheck();
 	}
 	else
 	{
+
 		UE_LOG(LogTemp, Log, TEXT("Ammo is Zero"));
+
 		if (UWorld* World = GetWorld())
 		{
 			APlayerController* PC = UGameplayStatics::GetPlayerController(World, 0);
@@ -85,22 +93,55 @@ void AVIAKWeapon::Fire()
 			}
 
 		}
-	}
+
+	}	
 }
 
 void AVIAKWeapon::Reload()
 {
-	Mesh->PlayAnimation(ReloadActionAnimation, false);
 
-	FTimerHandle ReloadTimeHandle;
-
-	GetWorld()->GetTimerManager().SetTimer(ReloadTimeHandle, FTimerDelegate::CreateLambda([&]()
+	if (UWorld* World = GetWorld())
 	{
-		SetAmmoCount(GetMaxAmmo());
+		APlayerController* PC = UGameplayStatics::GetPlayerController(World, 0);
 
-		// TimerHandle 초기화
-		GetWorld()->GetTimerManager().ClearTimer(ReloadTimeHandle);
-	}), ReloadTime, false);
+		if (PC)
+		{
+			AVICharacter* Character = Cast<AVICharacter>(PC->GetCharacter());
+
+			if (Character)
+			{
+				if (AmmoCount < MaxAmmo)
+				{
+					if (!bDoOnceReload && !Character->GetbIsReloading())
+					{
+						Character->SetbIsReloading(true);
+
+						Character->GetFirstPersonMesh()->GetAnimInstance()->Montage_Play(AKReloadActionMontage, 1.0f);
+
+						Mesh->PlayAnimation(ReloadActionAnimation, false);
+
+
+						FTimerHandle ReloadTimeHandle;
+
+						GetWorld()->GetTimerManager().SetTimer(ReloadTimeHandle, FTimerDelegate::CreateLambda([&]()
+						{
+							Character->SetbIsReloading(false);
+
+							AmmoCount = MaxAmmo;
+
+							DF("EndTimer bisRelaoding %d", Character->GetbIsReloading())
+
+							// TimerHandle 초기화
+							GetWorld()->GetTimerManager().ClearTimer(ReloadTimeHandle);
+						}), ReloadTime, false);
+
+						bDoOnceReload = false;
+					}
+				}
+			}
+		}
+	}
+
 
 }
 
@@ -163,8 +204,8 @@ void AVIAKWeapon::LineTrace()
 				// Camera Linetrace
 
 				FHitResult HitResult;
-				FVector TraceStart = Character->GetCamera()->GetComponentLocation();
-				FVector TraceEnd = Character->GetCamera()->GetForwardVector() * 20000.0f + TraceStart;
+				FVector TraceStart = Character->GetCamera()->GetComponentLocation() + FVector(0.5f,0.0f,-0.5f);
+				FVector TraceEnd = Character->GetCamera()->GetForwardVector() * 20000.0f + TraceStart ;
 
 				
 				/* Bullet Spread */
@@ -233,6 +274,19 @@ void AVIAKWeapon::LineTrace()
 					*/
 					SpawnDecalTracer(Muzzle->GetComponentLocation(), HitResult.ImpactPoint, HitResult.ImpactPoint);
 					
+
+					//Play Montage
+					
+					if (Character->GetbADS())
+					{
+						Character->GetFirstPersonMesh()->GetAnimInstance()->Montage_Play(AKADSFireActionMontage, 1.0f);
+					}
+					else
+					{
+						Character->GetFirstPersonMesh()->GetAnimInstance()->Montage_Play(AKFireActionMontage, 1.0f);;
+					}
+
+
 				}
 			
 

@@ -10,6 +10,8 @@
 #include "Components/PointLightComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 
+#include "VI.h"
+
 AVIGlockWeapon::AVIGlockWeapon()
 {
 
@@ -86,21 +88,52 @@ void AVIGlockWeapon::Fire()
 
 		}
 	}
+
 }
 
 void AVIGlockWeapon::Reload()
 {
-	Mesh->PlayAnimation(ReloadActionAnimation, false);
-
-	FTimerHandle ReloadTimeHandle;
-
-	GetWorld()->GetTimerManager().SetTimer(ReloadTimeHandle, FTimerDelegate::CreateLambda([&]()
+	if (UWorld* World = GetWorld())
 	{
-		SetAmmoCount(GetMaxAmmo());
+		APlayerController* PC = UGameplayStatics::GetPlayerController(World, 0);
 
-		// TimerHandle 초기화
-		GetWorld()->GetTimerManager().ClearTimer(ReloadTimeHandle);
-	}), ReloadTime, false);
+		if (PC)
+		{
+			AVICharacter* Character = Cast<AVICharacter>(PC->GetCharacter());
+
+			if (Character)
+			{
+				if (AmmoCount < MaxAmmo)
+				{
+					if (!bDoOnceReload && !Character->GetbIsReloading())
+					{
+						Character->SetbIsReloading(true);
+
+						Character->GetFirstPersonMesh()->GetAnimInstance()->Montage_Play(GlockReloadActionMontage, 1.0f);
+
+						Mesh->PlayAnimation(ReloadActionAnimation, false);
+
+
+						FTimerHandle ReloadTimeHandle;
+
+						GetWorld()->GetTimerManager().SetTimer(ReloadTimeHandle, FTimerDelegate::CreateLambda([&]()
+						{
+							Character->SetbIsReloading(false);
+
+							AmmoCount = MaxAmmo;
+
+							DF("EndTimer bisRelaoding %d", Character->GetbIsReloading())
+
+								// TimerHandle 초기화
+								GetWorld()->GetTimerManager().ClearTimer(ReloadTimeHandle);
+						}), ReloadTime, false);
+
+						bDoOnceReload = false;
+					}
+				}
+			}
+		}
+	}
 }
 
 
@@ -231,6 +264,17 @@ void AVIGlockWeapon::LineTrace()
 
 					*/
 					SpawnDecalTracer(Muzzle->GetComponentLocation(), HitResult.ImpactPoint, HitResult.ImpactPoint);
+
+
+					if (Character->GetbADS())
+					{
+						Character->GetFirstPersonMesh()->GetAnimInstance()->Montage_Play(GlockADSFireActionMontage, 1.0f);
+					}
+					else
+					{
+						Character->GetFirstPersonMesh()->GetAnimInstance()->Montage_Play(GlockFireActionMontage, 1.0f);;
+					}
+
 
 				}
 

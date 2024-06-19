@@ -35,11 +35,27 @@ public:
 
 protected:
 
+	
+
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animation)
 	TObjectPtr<class UAnimationAsset> FireActionAnimation;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animation)
 	TObjectPtr<class UAnimationAsset> ReloadActionAnimation;
+
+	//hand montage
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
+	TObjectPtr<class UAnimMontage> GlockFireActionMontage;
+
+	// 블루프린트에서 에셋 지정
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
+	TObjectPtr<class UAnimMontage> GlockReloadActionMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
+	TObjectPtr<class UAnimMontage> GlockADSFireActionMontage;
+
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sound)
 	TObjectPtr <class USoundWave> GunShotWav;

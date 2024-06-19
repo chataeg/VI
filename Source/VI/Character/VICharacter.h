@@ -9,7 +9,6 @@
 #include "VICharacter.generated.h"
 
 
-DECLARE_DELEGATE_OneParam(FBindActionParam, const float);
 
 /* 캐릭터 클래스 */
 UCLASS()
@@ -29,7 +28,11 @@ public:
 
 
 	FORCEINLINE bool GetbIsReloading() { return bIsReloading; };
+	FORCEINLINE void SetbIsReloading(bool value) { bIsReloading = value; };
+	FORCEINLINE bool GetbADS() { return bADS; };
 	FORCEINLINE TObjectPtr<class UCameraComponent> GetCamera() { return Camera; };
+	FORCEINLINE TObjectPtr<class USkeletalMeshComponent> GetFirstPersonMesh() { return FirstPersonMesh; };
+
 
 	// Camera Section
 protected:
@@ -56,12 +59,15 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon, Meta = (AllowPrivateAccess = "true"))
 	bool bIsReloading;
 
-	UPROPERTY()
-	bool bDoOnceReload;
 
 
 	UPROPERTY(VisibleAnywhere,BlueprintReadWrite, Meta = (AllowPrivateAccess = "true"))
 	bool bEquippedWeapon;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess = "true"))
+	int32 bWeaponEquipped;
+
+
 
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess = "true"))
@@ -73,41 +79,24 @@ protected:
 	int32 Health;
 
 
+protected:
+
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon , Meta = (AllowPrivateAccess = "true"))
-	TSubclassOf<class AActor> PrimaryWeaponBpRef;
+	TSubclassOf<class AActor> AKWeaponBpRef;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon , Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class AVIAKWeapon> PrimaryWeapon;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon, Meta = (AllowPrivateAccess = "true"))
-	TSubclassOf<class AActor> SecondaryWeaponBpRef;
+	TSubclassOf<class AActor> GlockWeaponBpRef;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class AVIGlockWeapon> SecondaryWeapon;
 
 
-	// 블루프린트에서 에셋 지정
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
-	TObjectPtr<class UAnimMontage> AKFireActionMontage;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
-	TObjectPtr<class UAnimMontage> AKADSFireActionMontage;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
-	TObjectPtr<class UAnimMontage> AKReloadActionMontage;
-
-
-
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
-	TObjectPtr<class UAnimMontage> GlockFireActionMontage;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
-	TObjectPtr<class UAnimMontage> GlockADSFireActionMontage;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
-	TObjectPtr<class UAnimMontage> GlockReloadActionMontage;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UChildActorComponent> Gun;
 
 
 
@@ -145,7 +134,6 @@ protected:
 
 
 	// TimeLine Section
-
 
 	FOnTimelineFloat ADSCallback;
 	FOnTimelineEvent ADSTimelineFinish;

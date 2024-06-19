@@ -71,6 +71,11 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Meta = (AllowPrivateAccess = "true"))
 	int32 MaxAmmo;
 
+
+	UPROPERTY()
+	bool bDoOnceReload;
+
+
 	UFUNCTION()
 	virtual void AmmoCheck() PURE_VIRTUAL(AVIWeaponbase::AmmoCheck,);
 

@@ -39,7 +39,9 @@ AVIWeaponbase::AVIWeaponbase()
 	MaxAmmo = 30;
 	AmmoCount = 30;
 	ReloadTime = 2.0f;
-	BulletSpread = 2000.0f;
+	BulletSpread = 2000.0f; 
+		bDoOnceReload = false;
+
 
 	static ConstructorHelpers::FClassFinder<AActor> BulletDecalBpRef(TEXT("/Script/Engine.Blueprint'/Game/VI/Character/Blueprint/Weapon/BP_BulletDecal.BP_BulletDecal_C'"));
 	if (BulletDecalBpRef.Class)

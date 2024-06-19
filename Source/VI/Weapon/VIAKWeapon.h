@@ -53,6 +53,23 @@ protected:
 	TObjectPtr <class USoundConcurrency> AKSoundConcurrencySettings;
 
 
+	UPROPERTY(EditAnywhere,BlueprintReadOnly, Meta = (AllowPrivateAccess = "true"))
+	FVector AimOffset;
+
+
+
+
+	// 블루프린트에서 에셋 지정
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
+	TObjectPtr<class UAnimMontage> AKFireActionMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
+	TObjectPtr<class UAnimMontage> AKReloadActionMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
+	TObjectPtr<class UAnimMontage> AKADSFireActionMontage;
+
 
 
 
