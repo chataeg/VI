@@ -116,13 +116,16 @@ void AVIGlockWeapon::Reload()
 
 						FTimerHandle ReloadTimeHandle;
 
-						GetWorld()->GetTimerManager().SetTimer(ReloadTimeHandle, FTimerDelegate::CreateLambda([&]()
+						AVICharacter* CapturedCharacter = Character;
+
+					
+						GetWorld()->GetTimerManager().SetTimer(ReloadTimeHandle, FTimerDelegate::CreateLambda([&, CapturedCharacter]()
 						{
-							Character->SetbIsReloading(false);
+							CapturedCharacter->SetbIsReloading(false);
 
 							AmmoCount = MaxAmmo;
 
-							DF("EndTimer bisRelaoding %d", Character->GetbIsReloading())
+						//	DF("EndTimer bisRelaoding %d", Character->GetbIsReloading())
 
 								// TimerHandle ÃÊ±âÈ­
 								GetWorld()->GetTimerManager().ClearTimer(ReloadTimeHandle);

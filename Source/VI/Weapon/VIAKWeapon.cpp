@@ -121,13 +121,13 @@ void AVIAKWeapon::Reload()
 
 						Mesh->PlayAnimation(ReloadActionAnimation, false);
 
-
-						
 						FTimerHandle ReloadTimeHandle;
 
-						GetWorld()->GetTimerManager().SetTimer(ReloadTimeHandle, FTimerDelegate::CreateLambda([&]()
+						AVICharacter* CapturedCharacter = Character;
+
+						GetWorld()->GetTimerManager().SetTimer(ReloadTimeHandle, FTimerDelegate::CreateLambda([&, CapturedCharacter]()
 						{
-							Character->SetbIsReloading(false);
+							CapturedCharacter->SetbIsReloading(false);
 
 							AmmoCount = MaxAmmo;
 

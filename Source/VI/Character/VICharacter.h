@@ -65,7 +65,7 @@ protected:
 	bool bEquippedWeapon;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess = "true"))
-	int32 bWeaponEquipped;
+	int32 WeaponEquipped;
 
 
 
@@ -85,14 +85,8 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon , Meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<class AActor> AKWeaponBpRef;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon , Meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class AVIAKWeapon> PrimaryWeapon;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon, Meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<class AActor> GlockWeaponBpRef;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon, Meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class AVIGlockWeapon> SecondaryWeapon;
 
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon, Meta = (AllowPrivateAccess = "true"))

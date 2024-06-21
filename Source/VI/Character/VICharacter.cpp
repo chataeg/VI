@@ -52,7 +52,7 @@ AVICharacter::AVICharacter()
 
 	bIsReloading = false;
 	bEquippedWeapon = true;
-	bWeaponEquipped = 0;
+	WeaponEquipped = 0;
 	bADS = false;
 
 	Health = 100;
@@ -357,8 +357,8 @@ void AVICharacter::EquipFirst()
 	DF("bIsReloading %d",GetbIsReloading())
 	if (!bIsReloading)
 	{
-		bWeaponEquipped = 0;
-		switch (bWeaponEquipped)
+		WeaponEquipped = 0;
+		switch (WeaponEquipped)
 		{ 
 			case 0:
 				Gun->SetChildActorClass(AKWeaponBpRef);
@@ -379,8 +379,8 @@ void AVICharacter::EquipSecond()
 	DF("bIsReloading %d", GetbIsReloading())
 	if (!bIsReloading)
 	{
-		bWeaponEquipped = 1;
-		switch (bWeaponEquipped)
+		WeaponEquipped = 1;
+		switch (WeaponEquipped)
 		{
 			case 0:
 				Gun->SetChildActorClass(AKWeaponBpRef);
