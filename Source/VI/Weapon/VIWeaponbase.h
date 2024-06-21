@@ -21,10 +21,10 @@ public:
 public:	
 
 	UFUNCTION()
-	virtual void Fire() PURE_VIRTUAL(AVIWeaponbase::Fire,);
+	virtual void Fire();
 
 	UFUNCTION()
-	virtual void Reload() PURE_VIRTUAL(AVIWeaponbase::Reload, );
+	virtual void Reload();
 
 	FORCEINLINE int32 GetAmmoCount() const { return AmmoCount; };
 	FORCEINLINE void SetAmmoCount(int32 NewAmmoCount) { AmmoCount = NewAmmoCount; };
@@ -77,16 +77,16 @@ protected:
 
 
 	UFUNCTION()
-	virtual void AmmoCheck() PURE_VIRTUAL(AVIWeaponbase::AmmoCheck,);
+	virtual void AmmoCheck() ;
 
 	UFUNCTION()
-	virtual void LineTrace() PURE_VIRTUAL(AVIWeaponbase::LineTrace, );
+	virtual void LineTrace() ;
 
 	UFUNCTION()
-	virtual void SpawnDecalTracer(FVector Location, FVector SpawnTransformLocation, FVector  ImpactPoint) PURE_VIRTUAL(AVIWeapons::SpawnDecalTracer, );
+	virtual void SpawnDecalTracer(FVector Location, FVector SpawnTransformLocation, FVector  ImpactPoint) ;
 
 	UFUNCTION()
-	virtual void MuzzleFlash() PURE_VIRTUAL(AVIWeaponbase::MuzzleFlash, );
+	virtual void MuzzleFlash() ;
 
 
 };

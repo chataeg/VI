@@ -340,22 +340,21 @@ void AVICharacter::Fire()
 
 	if (bIsReloading) return;
 	
-	//Cast<AVIWeaponbase>(Gun->GetChildActor())->Fire();
+	Cast<AVIWeaponbase>(Gun->GetChildActor())->Fire();
 
 }
 
 void AVICharacter::Reload()
 {
-	if (bEquippedWeapon)
-		PrimaryWeapon->Reload();
-	else
-		SecondaryWeapon->Reload();
+	Cast<AVIWeaponbase>(Gun->GetChildActor())->Reload();
+
 	
 }
 
 void AVICharacter::EquipFirst()
 {
-	
+	D("EquipFirst")
+	DF("bIsReloading %d",GetbIsReloading())
 	if (!bIsReloading)
 	{
 		bWeaponEquipped = 0;
@@ -371,15 +370,13 @@ void AVICharacter::EquipFirst()
 					break;
 		}
 	}
-	
-		//PrimaryWeapon->GetRootComponent()->SetVisibility(true);
-		//->GetRootComponent()->SetVisibility(false);
-	
-
 }
 
 void AVICharacter::EquipSecond()
 {
+
+	D("EquipSecond")
+	DF("bIsReloading %d", GetbIsReloading())
 	if (!bIsReloading)
 	{
 		bWeaponEquipped = 1;
@@ -395,11 +392,6 @@ void AVICharacter::EquipSecond()
 					break;
 		}
 	}
-	
-	//	PrimaryWeapon->GetRootComponent()->SetVisibility(false);
-	//	SecondaryWeapon->GetRootComponent()->SetVisibility(true);
-	
-
 }
 
 void AVICharacter::ADSTimeLineFunc(float value)

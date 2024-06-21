@@ -58,3 +58,27 @@ AVIWeaponbase::AVIWeaponbase()
 
 }
 
+void AVIWeaponbase::Fire()
+{
+}
+
+void AVIWeaponbase::Reload()
+{
+}
+
+void AVIWeaponbase::AmmoCheck()
+{
+}
+
+void AVIWeaponbase::LineTrace()
+{
+}
+
+void AVIWeaponbase::SpawnDecalTracer(FVector Location, FVector SpawnTransformLocation, FVector ImpactPoint)
+{
+}
+
+void AVIWeaponbase::MuzzleFlash()
+{
+}
+

@@ -99,6 +99,7 @@ void AVIAKWeapon::Fire()
 
 void AVIAKWeapon::Reload()
 {
+	Super::Reload();
 
 	if (UWorld* World = GetWorld())
 	{
@@ -121,6 +122,7 @@ void AVIAKWeapon::Reload()
 						Mesh->PlayAnimation(ReloadActionAnimation, false);
 
 
+						
 						FTimerHandle ReloadTimeHandle;
 
 						GetWorld()->GetTimerManager().SetTimer(ReloadTimeHandle, FTimerDelegate::CreateLambda([&]()
@@ -129,7 +131,7 @@ void AVIAKWeapon::Reload()
 
 							AmmoCount = MaxAmmo;
 
-							DF("EndTimer bisRelaoding %d", Character->GetbIsReloading())
+							//DF("EndTimer bisRelaoding %d", Character->GetbIsReloading())
 
 							// TimerHandle ÃÊ±âÈ­
 							GetWorld()->GetTimerManager().ClearTimer(ReloadTimeHandle);
@@ -147,6 +149,7 @@ void AVIAKWeapon::Reload()
 
 void AVIAKWeapon::AmmoCheck()
 {
+	Super::AmmoCheck();
 	//DF("Ammo %d",AmmoCount);
 
 	if (UWorld* World = GetWorld())
@@ -190,6 +193,8 @@ void AVIAKWeapon::AmmoCheck()
 
 void AVIAKWeapon::LineTrace()
 {
+	Super::LineTrace();
+
 	if (UWorld* World = GetWorld())
 	{
 		APlayerController* PC = UGameplayStatics::GetPlayerController(World, 0);
@@ -303,6 +308,8 @@ void AVIAKWeapon::LineTrace()
 
 void AVIAKWeapon::SpawnDecalTracer(FVector Location, FVector SpawnTransformLocation, FVector ImpactPoint)
 {
+	Super::SpawnDecalTracer(Location,SpawnTransformLocation,ImpactPoint);
+
 	if (UWorld* World = GetWorld())
 	{
 		if (BulletDecalRef != nullptr)
@@ -342,6 +349,8 @@ void AVIAKWeapon::SpawnDecalTracer(FVector Location, FVector SpawnTransformLocat
 
 void AVIAKWeapon::MuzzleFlash()
 {
+	Super::MuzzleFlash();
+
 	PointLight->SetIntensity(20000.0f);
 	
 	MuzzleFlashMesh->SetVisibility(true);
