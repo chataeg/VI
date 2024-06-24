@@ -31,6 +31,11 @@ public:
 	
 	virtual void MuzzleFlash() override;
 
+	virtual void UnEquip() override;
+	
+	virtual void Equip() override;
+
+
 	// Asset Section
 
 protected:

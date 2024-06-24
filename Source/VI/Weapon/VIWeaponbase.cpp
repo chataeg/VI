@@ -36,11 +36,11 @@ AVIWeaponbase::AVIWeaponbase()
 	MuzzleFlashMesh->SetRelativeLocation(FVector(74.9f, 0.0f, 9.75f));
 	
 
-	MaxAmmo = 30;
-	AmmoCount = 30;
-	ReloadTime = 2.0f;
-	BulletSpread = 2000.0f; 
-		bDoOnceReload = false;
+	MaxAmmo = 0;
+	AmmoCount = 0;
+	ReloadTime = 0.0f;
+	BulletSpread = 0.0f; 
+	bDoOnceReload = false;
 
 
 	static ConstructorHelpers::FClassFinder<AActor> BulletDecalBpRef(TEXT("/Script/Engine.Blueprint'/Game/VI/Character/Blueprint/Weapon/BP_BulletDecal.BP_BulletDecal_C'"));
@@ -79,6 +79,14 @@ void AVIWeaponbase::SpawnDecalTracer(FVector Location, FVector SpawnTransformLoc
 }
 
 void AVIWeaponbase::MuzzleFlash()
+{
+}
+
+void AVIWeaponbase::UnEquip()
+{
+}
+
+void AVIWeaponbase::Equip()
 {
 }
 

@@ -26,6 +26,12 @@ public:
 	UFUNCTION()
 	virtual void Reload();
 
+	UFUNCTION()
+	virtual void UnEquip();
+
+	UFUNCTION()
+	virtual void Equip();
+
 	FORCEINLINE int32 GetAmmoCount() const { return AmmoCount; };
 	FORCEINLINE void SetAmmoCount(int32 NewAmmoCount) { AmmoCount = NewAmmoCount; };
 
@@ -33,6 +39,11 @@ public:
 	FORCEINLINE void SetMaxAmmo(int32 NewMaxAmmo) { MaxAmmo = NewMaxAmmo; };
 	
 	FORCEINLINE int32 GetReloadTime() const { return ReloadTime; };
+	FORCEINLINE void SetReloadTime(float NewReloadTime) { ReloadTime = NewReloadTime; };
+	
+	FORCEINLINE int32 GetBulletSpread() const { return BulletSpread; };
+	FORCEINLINE void SetBulletSpread(float NewBulletSpread) { BulletSpread = NewBulletSpread; };
+
 
 
 protected:
@@ -75,18 +86,18 @@ protected:
 	UPROPERTY()
 	bool bDoOnceReload;
 
+	UFUNCTION()
+	virtual void AmmoCheck();
 
 	UFUNCTION()
-	virtual void AmmoCheck() ;
+	virtual void LineTrace();
 
 	UFUNCTION()
-	virtual void LineTrace() ;
+	virtual void SpawnDecalTracer(FVector Location, FVector SpawnTransformLocation, FVector  ImpactPoint);
 
 	UFUNCTION()
-	virtual void SpawnDecalTracer(FVector Location, FVector SpawnTransformLocation, FVector  ImpactPoint) ;
+	virtual void MuzzleFlash();
 
-	UFUNCTION()
-	virtual void MuzzleFlash() ;
 
 
 };

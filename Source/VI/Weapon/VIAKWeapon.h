@@ -29,6 +29,8 @@ public:
 	
 	virtual void MuzzleFlash() override;
 
+	virtual void UnEquip() override;
+
 
 	// Asset Section
 

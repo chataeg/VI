@@ -237,35 +237,6 @@ void AVIGlockWeapon::LineTrace()
 					ColorsLifeTime
 				))
 				{
-					// Muzzle Linetrace
-					/*
-					FHitResult HitResultMuzzle;
-					FVector TraceStartMuzzle = Muzzle->GetComponentLocation();
-					FVector TraceEndMuzzle = HitResult.ImpactPoint;
-
-					TArray<AActor*> ActorsToIgnoreMuzzle;
-					FColor ColorBeforeHitMuzzle = FColor::Green;
-					FColor ColorAfterHitMuzzle = FColor::Green;
-					float ColorsLifeTimeMuzzle = 5.f;
-
-
-					UKismetSystemLibrary::LineTraceSingle(
-						World,
-						TraceStartMuzzle,
-						TraceEndMuzzle,
-						UEngineTypes::ConvertToTraceType(ECC_Visibility),
-						false,
-						ActorsToIgnoreMuzzle,
-						EDrawDebugTrace::ForDuration,
-						HitResultMuzzle,
-						true,
-						ColorBeforeHitMuzzle,
-						ColorAfterHitMuzzle,
-						ColorsLifeTimeMuzzle);
-
-					//SpawnDecalTracer(Muzzle->GetComponentLocation(), HitResultMuzzle.ImpactPoint, HitResultMuzzle.ImpactPoint);
-
-					*/
 					SpawnDecalTracer(Muzzle->GetComponentLocation(), HitResult.ImpactPoint, HitResult.ImpactPoint);
 
 
@@ -347,5 +318,26 @@ void AVIGlockWeapon::MuzzleFlash()
 
 	MuzzleFlashMesh->SetWorldScale3D(FVector(FMath::RandRange(0.1f, 0.3f), FMath::RandRange(0.1f, 0.3f), FMath::RandRange(0.1f, 0.3f)));
 
+}
+
+void AVIGlockWeapon::UnEquip()
+{
+	FGunData* GunDataPtr;	
+	APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+
+	AVICharacter* CharacterPtr = Cast<AVICharacter>(PC->GetCharacter());
+	GunDataPtr = CharacterPtr->GetSecondaryWeapon();
+
+	GunDataPtr->Class = CharacterPtr->GetGlockWeaponBpRef();
+	GunDataPtr->AmmoCount = AmmoCount;
+	GunDataPtr->MaxAmmo = MaxAmmo;
+	GunDataPtr->ReloadTime = ReloadTime;
+	GunDataPtr->BulletSpread = BulletSpread;
+
+
+}
+
+void AVIGlockWeapon::Equip()
+{
 }
 	

@@ -6,6 +6,8 @@
 #include "Character/VICharacterBase.h"
 #include "InputActionValue.h"
 #include "Components/TimelineComponent.h"
+
+#include "GameData/VIGunData.h"
 #include "VICharacter.generated.h"
 
 
@@ -30,6 +32,12 @@ public:
 	FORCEINLINE bool GetbIsReloading() { return bIsReloading; };
 	FORCEINLINE void SetbIsReloading(bool value) { bIsReloading = value; };
 	FORCEINLINE bool GetbADS() { return bADS; };
+	FORCEINLINE FGunData* GetPrimaryWeapon() { return &PrimaryWeapon; }
+	FORCEINLINE FGunData* GetSecondaryWeapon() { return &SecondaryWeapon; }
+	FORCEINLINE TSubclassOf<class AActor> GetAKWeaponBpRef() { return AKWeaponBpRef; }
+	FORCEINLINE TSubclassOf<class AActor> GetGlockWeaponBpRef() { return GlockWeaponBpRef; }
+
+
 	FORCEINLINE TObjectPtr<class UCameraComponent> GetCamera() { return Camera; };
 	FORCEINLINE TObjectPtr<class USkeletalMeshComponent> GetFirstPersonMesh() { return FirstPersonMesh; };
 
@@ -88,10 +96,21 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon, Meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<class AActor> GlockWeaponBpRef;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon, Meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<class AActor> WeaponBaseBpRef;
+
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon, Meta = (AllowPrivateAccess = "true"))
+	FGunData PrimaryWeapon;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon, Meta = (AllowPrivateAccess = "true"))
+	FGunData SecondaryWeapon;
+
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UChildActorComponent> Gun;
 
+	
 
 
 
@@ -122,6 +141,14 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> EquipSecondAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction> SetupFirstWeaponAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction> SetupSecondWeaponAction;
+
+
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> ADSAction;
@@ -154,6 +181,10 @@ protected:
 	void EquipFirst();
 
 	void EquipSecond();
+
+	void SetupFirst();
+
+	void SetupSecond();
 
 
 	UFUNCTION()

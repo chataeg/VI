@@ -248,35 +248,7 @@ void AVIAKWeapon::LineTrace()
 					ColorsLifeTime
 				))
 				{
-					// Muzzle Linetrace
-					/*
-					FHitResult HitResultMuzzle;
-					FVector TraceStartMuzzle = Muzzle->GetComponentLocation();
-					FVector TraceEndMuzzle = HitResult.ImpactPoint;
-
-					TArray<AActor*> ActorsToIgnoreMuzzle;
-					FColor ColorBeforeHitMuzzle = FColor::Green;
-					FColor ColorAfterHitMuzzle = FColor::Green;
-					float ColorsLifeTimeMuzzle = 5.f;
-
-					
-					UKismetSystemLibrary::LineTraceSingle(
-						World,
-						TraceStartMuzzle,
-						TraceEndMuzzle,
-						UEngineTypes::ConvertToTraceType(ECC_Visibility),
-						false,
-						ActorsToIgnoreMuzzle,
-						EDrawDebugTrace::ForDuration,
-						HitResultMuzzle,
-						true,
-						ColorBeforeHitMuzzle,
-						ColorAfterHitMuzzle,
-						ColorsLifeTimeMuzzle);
-					
-					//SpawnDecalTracer(Muzzle->GetComponentLocation(), HitResultMuzzle.ImpactPoint, HitResultMuzzle.ImpactPoint);
-
-					*/
+				
 					SpawnDecalTracer(Muzzle->GetComponentLocation(), HitResult.ImpactPoint, HitResult.ImpactPoint);
 					
 
@@ -301,7 +273,6 @@ void AVIAKWeapon::LineTrace()
 		}
 	}
 	
-	//return TTuple<FVector, FVector>(FVector::ZeroVector, FVector::ZeroVector);
 
 
 }
@@ -368,6 +339,26 @@ void AVIAKWeapon::MuzzleFlash()
 	MuzzleFlashMesh->SetRelativeRotation(FRotator(FMath::RandRange(-90.0f,90.0f),90.0f,90.f));
 
 	MuzzleFlashMesh->SetWorldScale3D(FVector(FMath::RandRange(0.2f,0.6f), FMath::RandRange(0.2f, 0.6f), FMath::RandRange(0.2f, 0.6f)));
+
+
+}
+
+void AVIAKWeapon::UnEquip()
+{
+	
+	FGunData* GunDataPtr;
+
+	APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+
+
+	AVICharacter* CharacterPtr = Cast<AVICharacter>(PC->GetCharacter());
+	GunDataPtr = CharacterPtr->GetPrimaryWeapon();
+
+	GunDataPtr->Class = CharacterPtr->GetAKWeaponBpRef();
+	GunDataPtr->AmmoCount = AmmoCount;
+	GunDataPtr->MaxAmmo = MaxAmmo;
+	GunDataPtr->ReloadTime = ReloadTime;
+	GunDataPtr->BulletSpread = BulletSpread;
 
 
 }

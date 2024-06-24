@@ -13,6 +13,7 @@
 
 #include "VI/Player/VIPlayerController.h"
 #include "VI.h"
+#include "GameData/VIGunData.h"
 
 #include "Components/TimelineComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -43,10 +44,12 @@ AVICharacter::AVICharacter()
 	static ConstructorHelpers::FClassFinder<AVIWeaponbase> WeaponBaseRef(TEXT("/Script/Engine.Blueprint'/Game/VI/Character/Blueprint/Weapon/BP_Weaponbase.BP_Weaponbase_C'"));
 	if (WeaponBaseRef.Class)
 	{
-		
+		WeaponBaseBpRef = WeaponBaseRef.Class;
+
 		Gun = CreateDefaultSubobject<UChildActorComponent>(TEXT("Gun"));
 		Gun->SetChildActorClass(WeaponBaseRef.Class);
 		Gun->SetupAttachment(FirstPersonMesh, FName(TEXT("Palm_R")));
+		
 	}
 	
 
@@ -74,6 +77,12 @@ AVICharacter::AVICharacter()
 	PostProcessComponent = CreateDefaultSubobject<UPostProcessComponent>(TEXT("PostProcessComponent"));
 	PostProcessComponent->SetupAttachment(RootComponent);
 
+
+	PrimaryWeapon.Class = WeaponBaseBpRef;
+	SecondaryWeapon.Class = WeaponBaseBpRef;
+
+
+
 	
 	// 애니메이션 블루프린트 로딩 시 크래시가 일어나 블루프린트에서 로딩합니다.
 
@@ -93,10 +102,6 @@ AVICharacter::AVICharacter()
 
 	ADSTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("ADSTimeline"));
 	ADSCallback.BindUFunction(this, FName("ADSTimeLineFunc"));
-	//ADSTimelineFinish.BindUFunction(this, FName("EndADS"));
-	
-
-
 
 	// Constructor Section
 	
@@ -167,6 +172,17 @@ AVICharacter::AVICharacter()
 		ADSAction = InputActionADSActionRef.Object;
 	}
 
+	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionSetupFirstWeaponRef(TEXT("/Script/EnhancedInput.InputAction'/Game/VI/Character/Input/Actions/IA_SetupFirst.IA_SetupFirst'"));
+	if (nullptr != InputActionSetupFirstWeaponRef.Object)
+	{
+		SetupFirstWeaponAction = InputActionSetupFirstWeaponRef.Object;
+	}
+	
+	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionSetupSecondWeaponRef(TEXT("/Script/EnhancedInput.InputAction'/Game/VI/Character/Input/Actions/IA_SetupSecond.IA_SetupSecond'"));
+	if (nullptr != InputActionSetupSecondWeaponRef.Object)
+	{
+		SetupSecondWeaponAction = InputActionSetupSecondWeaponRef.Object;
+	}
 
 
 	static ConstructorHelpers::FObjectFinder<UCurveFloat> ADSCurveRef(TEXT("/Script/Engine.CurveFloat'/Game/VI/Character/Blueprint/Curve/Curve_ADS.Curve_ADS'"));
@@ -190,7 +206,8 @@ void AVICharacter::BeginPlay()
 	ADSTimeline->SetTimelineLength(0.15f);
 	ADSTimeline->SetLooping(false);
 	//ADSTimeline->SetTimelineFinishedFunc(ADSTimelineFinish);
-	
+
+
 
 
 }
@@ -211,6 +228,10 @@ void AVICharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 	EnhancedInputComponent->BindAction(EquipFirstAction, ETriggerEvent::Triggered, this, &AVICharacter::EquipFirst);
 	EnhancedInputComponent->BindAction(EquipSecondAction, ETriggerEvent::Triggered, this, &AVICharacter::EquipSecond);
+
+	EnhancedInputComponent->BindAction(SetupFirstWeaponAction, ETriggerEvent::Triggered, this, &AVICharacter::SetupFirst);
+	EnhancedInputComponent->BindAction(SetupSecondWeaponAction, ETriggerEvent::Triggered, this, &AVICharacter::SetupSecond);
+
 
 	EnhancedInputComponent->BindAction(ADSAction, ETriggerEvent::Triggered, this, &AVICharacter::StartADS);
 	
@@ -348,50 +369,104 @@ void AVICharacter::Reload()
 {
 	Cast<AVIWeaponbase>(Gun->GetChildActor())->Reload();
 
-	
 }
 
 void AVICharacter::EquipFirst()
 {
 	D("EquipFirst")
-	DF("bIsReloading %d",GetbIsReloading())
-	if (!bIsReloading)
+
+	if (PrimaryWeapon.Class != WeaponBaseBpRef || SecondaryWeapon.Class != WeaponBaseBpRef)
 	{
-		WeaponEquipped = 0;
-		switch (WeaponEquipped)
-		{ 
-			case 0:
-				Gun->SetChildActorClass(AKWeaponBpRef);
-				D("Equipped AK")
-					break;
-			case 1:
-				Gun->SetChildActorClass(GlockWeaponBpRef);
-				D("Equipped Glock")
-					break;
+		AVIWeaponbase* CastedGunRef = Cast<AVIWeaponbase>(Gun->GetChildActor());
+		
+		if (!bIsReloading)
+		{
+			WeaponEquipped = 0;
+				
+			CastedGunRef->UnEquip();
+
+			Gun->SetChildActorClass(AKWeaponBpRef);
+
+			DF("Secondary Weapon %d", (SecondaryWeapon.Class == GlockWeaponBpRef) ? 1 : 0)
+
+			if (PrimaryWeapon.Class == WeaponBaseBpRef)
+			{
+				Gun->SetChildActorClass(WeaponBaseBpRef);
+				FirstPersonMesh->SetVisibility(false);
+			}
+			else
+			{
+				CastedGunRef->SetAmmoCount(PrimaryWeapon.AmmoCount);
+				CastedGunRef->SetMaxAmmo(PrimaryWeapon.MaxAmmo);
+				CastedGunRef->SetBulletSpread(PrimaryWeapon.BulletSpread);
+				CastedGunRef->SetReloadTime(PrimaryWeapon.ReloadTime);
+				FirstPersonMesh->SetVisibility(true);
+
+				CastedGunRef->Equip();		
+			}
 		}
 	}
+
 }
 
 void AVICharacter::EquipSecond()
 {
 
 	D("EquipSecond")
-	DF("bIsReloading %d", GetbIsReloading())
-	if (!bIsReloading)
-	{
-		WeaponEquipped = 1;
-		switch (WeaponEquipped)
+
+		if (PrimaryWeapon.Class != WeaponBaseBpRef || SecondaryWeapon.Class != WeaponBaseBpRef)
 		{
-			case 0:
-				Gun->SetChildActorClass(AKWeaponBpRef);
-				D("Equipped AK")
-					break;
-			case 1:
+			AVIWeaponbase* CastedGunRef = Cast<AVIWeaponbase>(Gun->GetChildActor());
+		
+			if (!bIsReloading)
+			{
+				WeaponEquipped = 1;
+			
+				CastedGunRef->UnEquip();
+
 				Gun->SetChildActorClass(GlockWeaponBpRef);
-				D("Equipped Glock")
-					break;
+
+				DF("Secondary Weapon %d", (SecondaryWeapon.Class == GlockWeaponBpRef) ? 1 : 0)
+
+				if (SecondaryWeapon.Class == WeaponBaseBpRef)
+				{
+					Gun->SetChildActorClass(WeaponBaseBpRef);
+					FirstPersonMesh->SetVisibility(false);
+					D("SecondaryWeapon is empty")
+				}
+				else
+				{
+					CastedGunRef->SetAmmoCount(SecondaryWeapon.AmmoCount);
+					CastedGunRef->SetMaxAmmo(SecondaryWeapon.MaxAmmo);
+					CastedGunRef->SetBulletSpread(SecondaryWeapon.BulletSpread);
+					CastedGunRef->SetReloadTime(SecondaryWeapon.ReloadTime);
+					FirstPersonMesh->SetVisibility(true);
+				}
+			}
 		}
-	}
+}
+
+void AVICharacter::SetupFirst()
+{
+	D("SetupFirst")
+	PrimaryWeapon.Class = AKWeaponBpRef;
+	PrimaryWeapon.AmmoCount = 30;
+	PrimaryWeapon.MaxAmmo = 30;
+	PrimaryWeapon.ReloadTime = 2.0f;
+	PrimaryWeapon.BulletSpread = 2000.0f;
+
+	DF("Secondary Weapon %d", (SecondaryWeapon.Class == GlockWeaponBpRef) ? 1 : 0)
+
+}
+
+void AVICharacter::SetupSecond()
+{
+	D("SetupSecond")
+	SecondaryWeapon.Class = GlockWeaponBpRef;
+	SecondaryWeapon.AmmoCount = 11;
+	SecondaryWeapon.MaxAmmo = 11;
+	SecondaryWeapon.ReloadTime = 1.5f;
+	SecondaryWeapon.BulletSpread = 1500.0f;
 }
 
 void AVICharacter::ADSTimeLineFunc(float value)
