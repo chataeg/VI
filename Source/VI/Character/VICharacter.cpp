@@ -11,6 +11,10 @@
 #include "Weapon/VIAKWeapon.h"
 #include "Weapon/VIGlockWeapon.h"
 
+#include "Weapon/PickUpAKWeapon.h"
+#include "Weapon/PickUpGlockWeapon.h"
+
+
 #include "VI/Player/VIPlayerController.h"
 #include "VI.h"
 #include "GameData/VIGunData.h"
@@ -77,6 +81,10 @@ AVICharacter::AVICharacter()
 	PostProcessComponent = CreateDefaultSubobject<UPostProcessComponent>(TEXT("PostProcessComponent"));
 	PostProcessComponent->SetupAttachment(RootComponent);
 
+	ThrowWeaponSceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("ThrowPoint"));
+	ThrowWeaponSceneComponent->SetupAttachment(RootComponent);
+	ThrowWeaponSceneComponent->SetRelativeLocation(FVector(80.0f,0.0f , 37.7f));
+
 
 	PrimaryWeapon.Class = WeaponBaseBpRef;
 	SecondaryWeapon.Class = WeaponBaseBpRef;
@@ -115,6 +123,18 @@ AVICharacter::AVICharacter()
 	if (GlockWeaponBp.Succeeded())
 	{
 		GlockWeaponBpRef = GlockWeaponBp.Class;
+	}
+
+	static ConstructorHelpers::FClassFinder<AActor> PickupAKWeaponBp(TEXT("/Script/Engine.Blueprint'/Game/VI/Character/Blueprint/Weapon/BP_PickUpAKWeapon.BP_PickUpAKWeapon_C'"));
+	if (PickupAKWeaponBp.Succeeded())
+	{
+		PickUpAKWeaponBpRef = PickupAKWeaponBp.Class;
+	}
+
+	static ConstructorHelpers::FClassFinder<AActor> PickUpGlockWeaponBp(TEXT("/Script/Engine.Blueprint'/Game/VI/Character/Blueprint/Weapon/BP_PickUpGlockWeapon.BP_PickUpGlockWeapon_C'"));
+	if (PickUpGlockWeaponBp.Succeeded())
+	{
+		PickUpGlockWeaponBpRef = PickUpGlockWeaponBp.Class;
 	}
 
 
@@ -184,6 +204,11 @@ AVICharacter::AVICharacter()
 		SetupSecondWeaponAction = InputActionSetupSecondWeaponRef.Object;
 	}
 
+	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionThrowWeaponRef(TEXT("/Script/EnhancedInput.InputAction'/Game/VI/Character/Input/Actions/IA_ThrowWeapon.IA_ThrowWeapon'"));
+	if (nullptr != InputActionThrowWeaponRef.Object)
+	{
+		ThrowWeaponAction = InputActionThrowWeaponRef.Object;
+	}
 
 	static ConstructorHelpers::FObjectFinder<UCurveFloat> ADSCurveRef(TEXT("/Script/Engine.CurveFloat'/Game/VI/Character/Blueprint/Curve/Curve_ADS.Curve_ADS'"));
 	if (nullptr != ADSCurveRef.Object)
@@ -231,6 +256,9 @@ void AVICharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 	EnhancedInputComponent->BindAction(SetupFirstWeaponAction, ETriggerEvent::Triggered, this, &AVICharacter::SetupFirst);
 	EnhancedInputComponent->BindAction(SetupSecondWeaponAction, ETriggerEvent::Triggered, this, &AVICharacter::SetupSecond);
+	
+	EnhancedInputComponent->BindAction(ThrowWeaponAction, ETriggerEvent::Triggered, this, &AVICharacter::ThrowWeapon);
+
 
 
 	EnhancedInputComponent->BindAction(ADSAction, ETriggerEvent::Triggered, this, &AVICharacter::StartADS);
@@ -467,6 +495,81 @@ void AVICharacter::SetupSecond()
 	SecondaryWeapon.MaxAmmo = 11;
 	SecondaryWeapon.ReloadTime = 1.5f;
 	SecondaryWeapon.BulletSpread = 1500.0f;
+}
+
+void AVICharacter::ThrowWeapon()
+{
+	switch (WeaponEquipped)
+	{
+	case 0:
+		if (PrimaryWeapon.Class == AKWeaponBpRef)
+		{	
+			// 스폰할 위치와 회전을 지정
+			FVector SpawnLocation = ThrowWeaponSceneComponent->GetComponentLocation();
+			FRotator SpawnRotation = FRotator(FMath::RandRange(-180.0f,180.0f), FMath::RandRange(-180.0f, 180.0f), FMath::RandRange(-180.0f, 180.0f));
+
+			// 액터 스폰 파라미터 설정
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.Owner = this;
+			SpawnParams.Instigator = GetInstigator();
+
+			// 월드에서 액터를 스폰
+			APickUpAKWeapon* ThrownWeapon = GetWorld()->SpawnActor<APickUpAKWeapon>(PickUpAKWeaponBpRef, SpawnLocation, SpawnRotation, SpawnParams);
+			
+			ThrownWeapon->GetStaticMesh()->AddImpulse(ThrowWeaponSceneComponent->GetForwardVector() * 500.0f, TEXT("None"), true);
+
+			PrimaryWeapon.Class = WeaponBaseBpRef;
+			PrimaryWeapon.AmmoCount = 0;
+			PrimaryWeapon.MaxAmmo = 0;
+			PrimaryWeapon.ReloadTime = 0;
+			PrimaryWeapon.BulletSpread = 0;
+
+			Gun->SetChildActorClass(WeaponBaseBpRef);
+
+			FirstPersonMesh->SetVisibility(false);
+
+
+
+
+				
+		}
+
+
+		break;
+	case 1:
+		if (SecondaryWeapon.Class == GlockWeaponBpRef)
+		{
+			// 스폰할 위치와 회전을 지정
+			FVector SpawnLocation = ThrowWeaponSceneComponent->GetComponentLocation();
+			FRotator SpawnRotation = FRotator(FMath::RandRange(-180.0f, 180.0f), FMath::RandRange(-180.0f, 180.0f), FMath::RandRange(-180.0f, 180.0f));
+
+			// 액터 스폰 파라미터 설정
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.Owner = this;
+			SpawnParams.Instigator = GetInstigator();
+
+			// 월드에서 액터를 스폰
+			APickUpGlockWeapon* ThrownWeapon = GetWorld()->SpawnActor<APickUpGlockWeapon>(PickUpGlockWeaponBpRef, SpawnLocation, SpawnRotation, SpawnParams);
+
+			ThrownWeapon->GetStaticMesh()->AddImpulse(ThrowWeaponSceneComponent->GetForwardVector() * 500.0f, TEXT("None"), true);
+
+			SecondaryWeapon.Class = WeaponBaseBpRef;
+			SecondaryWeapon.AmmoCount = 0;
+			SecondaryWeapon.MaxAmmo = 0;
+			SecondaryWeapon.ReloadTime = 0;
+			SecondaryWeapon.BulletSpread = 0;
+
+			Gun->SetChildActorClass(WeaponBaseBpRef);
+
+			FirstPersonMesh->SetVisibility(false);
+		}
+
+		break;
+
+	}
+
+
+
 }
 
 void AVICharacter::ADSTimeLineFunc(float value)

@@ -36,6 +36,7 @@ public:
 	FORCEINLINE FGunData* GetSecondaryWeapon() { return &SecondaryWeapon; }
 	FORCEINLINE TSubclassOf<class AActor> GetAKWeaponBpRef() { return AKWeaponBpRef; }
 	FORCEINLINE TSubclassOf<class AActor> GetGlockWeaponBpRef() { return GlockWeaponBpRef; }
+	FORCEINLINE TSubclassOf<class AActor> GetWeaponBaseBpRef() { return WeaponBaseBpRef; }
 
 
 	FORCEINLINE TObjectPtr<class UCameraComponent> GetCamera() { return Camera; };
@@ -59,6 +60,12 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = PostProcess)
 	
 	TObjectPtr <class UPostProcessComponent> PostProcessComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = PostProcess)
+
+	TObjectPtr <class USceneComponent> ThrowWeaponSceneComponent;
+
+
 	
 
 	// Weapon Section
@@ -98,6 +105,14 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon, Meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<class AActor> WeaponBaseBpRef;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon, Meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<class AActor> PickUpAKWeaponBpRef;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon, Meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<class AActor> PickUpGlockWeaponBpRef;
+
+
 
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon, Meta = (AllowPrivateAccess = "true"))
@@ -148,7 +163,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> SetupSecondWeaponAction;
 
-
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction> ThrowWeaponAction;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> ADSAction;
@@ -185,6 +201,8 @@ protected:
 	void SetupFirst();
 
 	void SetupSecond();
+
+	void ThrowWeapon();
 
 
 	UFUNCTION()
