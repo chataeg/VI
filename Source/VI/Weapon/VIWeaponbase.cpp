@@ -15,7 +15,7 @@
 // Sets default values
 AVIWeaponbase::AVIWeaponbase()
 {
- 	
+ 	D("Weaponbase constructor")
 	Mesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("PrimaryWeapon"));
 	Mesh->SetupAttachment(RootComponent);
 
@@ -35,7 +35,7 @@ AVIWeaponbase::AVIWeaponbase()
 	MuzzleFlashMesh->SetRelativeScale3D(FVector(0.6f, 0.6f, 0.6f));
 	MuzzleFlashMesh->SetRelativeLocation(FVector(74.9f, 0.0f, 9.75f));
 	
-
+	
 	MaxAmmo = 0;
 	AmmoCount = 0;
 	ReloadTime = 0.0f;
@@ -84,6 +84,10 @@ void AVIWeaponbase::MuzzleFlash()
 
 void AVIWeaponbase::UnEquip()
 {
+	//D("UnEquip")
+
+	
+
 }
 
 void AVIWeaponbase::Equip()

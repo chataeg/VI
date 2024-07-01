@@ -32,8 +32,11 @@ public:
 	FORCEINLINE bool GetbIsReloading() { return bIsReloading; };
 	FORCEINLINE void SetbIsReloading(bool value) { bIsReloading = value; };
 	FORCEINLINE bool GetbADS() { return bADS; };
+	
 	FORCEINLINE FGunData* GetPrimaryWeapon() { return &PrimaryWeapon; }
 	FORCEINLINE FGunData* GetSecondaryWeapon() { return &SecondaryWeapon; }
+	FORCEINLINE UChildActorComponent* GetGun() { return Gun; }
+	
 	FORCEINLINE TSubclassOf<class AActor> GetAKWeaponBpRef() { return AKWeaponBpRef; }
 	FORCEINLINE TSubclassOf<class AActor> GetGlockWeaponBpRef() { return GlockWeaponBpRef; }
 	FORCEINLINE TSubclassOf<class AActor> GetWeaponBaseBpRef() { return WeaponBaseBpRef; }

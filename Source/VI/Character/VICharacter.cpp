@@ -401,22 +401,21 @@ void AVICharacter::Reload()
 
 void AVICharacter::EquipFirst()
 {
-	D("EquipFirst")
+	//D("EquipFirst")
 
 	if (PrimaryWeapon.Class != WeaponBaseBpRef || SecondaryWeapon.Class != WeaponBaseBpRef)
 	{
-		AVIWeaponbase* CastedGunRef = Cast<AVIWeaponbase>(Gun->GetChildActor());
 		
 		if (!bIsReloading)
 		{
 			WeaponEquipped = 0;
-				
+			
+			AVIWeaponbase* CastedGunRef = Cast<AVIWeaponbase>(Gun->GetChildActor());
+
 			CastedGunRef->UnEquip();
-
+		
 			Gun->SetChildActorClass(AKWeaponBpRef);
-
-			DF("Secondary Weapon %d", (SecondaryWeapon.Class == GlockWeaponBpRef) ? 1 : 0)
-
+		
 			if (PrimaryWeapon.Class == WeaponBaseBpRef)
 			{
 				Gun->SetChildActorClass(WeaponBaseBpRef);
@@ -424,13 +423,16 @@ void AVICharacter::EquipFirst()
 			}
 			else
 			{
-				CastedGunRef->SetAmmoCount(PrimaryWeapon.AmmoCount);
-				CastedGunRef->SetMaxAmmo(PrimaryWeapon.MaxAmmo);
-				CastedGunRef->SetBulletSpread(PrimaryWeapon.BulletSpread);
-				CastedGunRef->SetReloadTime(PrimaryWeapon.ReloadTime);
+				AVIWeaponbase* ReCastedGunRef = Cast<AVIWeaponbase>(Gun->GetChildActor());
+				DF("PrimaryWeapon AmmoCount = %d", PrimaryWeapon.AmmoCount);
+			
+				ReCastedGunRef->SetAmmoCount(PrimaryWeapon.AmmoCount);
+				ReCastedGunRef->SetMaxAmmo(PrimaryWeapon.MaxAmmo);
+				ReCastedGunRef->SetBulletSpread(PrimaryWeapon.BulletSpread);
+				ReCastedGunRef->SetReloadTime(PrimaryWeapon.ReloadTime);
 				FirstPersonMesh->SetVisibility(true);
+				DF("Casted AmmoCount = %d", ReCastedGunRef->GetAmmoCount());
 
-				CastedGunRef->Equip();		
 			}
 		}
 	}
@@ -440,34 +442,36 @@ void AVICharacter::EquipFirst()
 void AVICharacter::EquipSecond()
 {
 
-	D("EquipSecond")
+//	D("EquipSecond")
 
 		if (PrimaryWeapon.Class != WeaponBaseBpRef || SecondaryWeapon.Class != WeaponBaseBpRef)
 		{
-			AVIWeaponbase* CastedGunRef = Cast<AVIWeaponbase>(Gun->GetChildActor());
 		
 			if (!bIsReloading)
 			{
 				WeaponEquipped = 1;
-			
+
+				AVIWeaponbase* CastedGunRef = Cast<AVIWeaponbase>(Gun->GetChildActor());
+
 				CastedGunRef->UnEquip();
 
 				Gun->SetChildActorClass(GlockWeaponBpRef);
-
-				DF("Secondary Weapon %d", (SecondaryWeapon.Class == GlockWeaponBpRef) ? 1 : 0)
 
 				if (SecondaryWeapon.Class == WeaponBaseBpRef)
 				{
 					Gun->SetChildActorClass(WeaponBaseBpRef);
 					FirstPersonMesh->SetVisibility(false);
-					D("SecondaryWeapon is empty")
+				//	D("SecondaryWeapon is empty")
 				}
 				else
 				{
-					CastedGunRef->SetAmmoCount(SecondaryWeapon.AmmoCount);
-					CastedGunRef->SetMaxAmmo(SecondaryWeapon.MaxAmmo);
-					CastedGunRef->SetBulletSpread(SecondaryWeapon.BulletSpread);
-					CastedGunRef->SetReloadTime(SecondaryWeapon.ReloadTime);
+				
+					AVIWeaponbase* ReCastedGunRef = Cast<AVIWeaponbase>(Gun->GetChildActor());
+
+					ReCastedGunRef->SetAmmoCount(SecondaryWeapon.AmmoCount);
+					ReCastedGunRef->SetMaxAmmo(SecondaryWeapon.MaxAmmo);
+					ReCastedGunRef->SetBulletSpread(SecondaryWeapon.BulletSpread);
+					ReCastedGunRef->SetReloadTime(SecondaryWeapon.ReloadTime);
 					FirstPersonMesh->SetVisibility(true);
 				}
 			}
@@ -482,14 +486,15 @@ void AVICharacter::SetupFirst()
 	PrimaryWeapon.MaxAmmo = 30;
 	PrimaryWeapon.ReloadTime = 2.0f;
 	PrimaryWeapon.BulletSpread = 2000.0f;
+	DF("PrimaryWeapon AmmoCount = %d", PrimaryWeapon.AmmoCount);
 
-	DF("Secondary Weapon %d", (SecondaryWeapon.Class == GlockWeaponBpRef) ? 1 : 0)
+//	DF("Secondary Weapon %d", (SecondaryWeapon.Class == GlockWeaponBpRef) ? 1 : 0)
 
 }
 
 void AVICharacter::SetupSecond()
 {
-	D("SetupSecond")
+//	D("SetupSecond")
 	SecondaryWeapon.Class = GlockWeaponBpRef;
 	SecondaryWeapon.AmmoCount = 11;
 	SecondaryWeapon.MaxAmmo = 11;
@@ -606,6 +611,5 @@ void AVICharacter::StartADS()
 			bADS = false;
 		ADSTimeline->ReverseFromEnd();
 	}
-	
 
 }

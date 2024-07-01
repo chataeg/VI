@@ -15,10 +15,14 @@
 AVIAKWeapon::AVIAKWeapon()
 {
 
+	D("AKWeapon Constructor")
+
+
 	MaxAmmo = 30;
 	AmmoCount = 30;
 	ReloadTime = 2.0f;
 	BulletSpread = 2000.0f;
+	
 	AimOffset = FVector(0.0f, 0.0f, -2.0f);
 
 	
@@ -345,20 +349,37 @@ void AVIAKWeapon::MuzzleFlash()
 
 void AVIAKWeapon::UnEquip()
 {
-	
-	FGunData* GunDataPtr;
+	Super::UnEquip();
 
 	APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 
-
 	AVICharacter* CharacterPtr = Cast<AVICharacter>(PC->GetCharacter());
+
+
+	UChildActorComponent* GunPtr = CharacterPtr->GetGun();
+	FGunData* GunDataPtr;
+
 	GunDataPtr = CharacterPtr->GetPrimaryWeapon();
 
-	GunDataPtr->Class = CharacterPtr->GetAKWeaponBpRef();
+	if (GunPtr->GetChildActorClass() == CharacterPtr->GetWeaponBaseBpRef())
+	{
+		//GunDataPtr->Class = CharacterPtr->GetWeaponBaseBpRef();
+	}
+	else if (GunPtr->GetChildActorClass() == CharacterPtr->GetAKWeaponBpRef())
+	{
+		GunDataPtr = CharacterPtr->GetPrimaryWeapon();
+		GunDataPtr->Class = CharacterPtr->GetAKWeaponBpRef();
+	}
+	else if (GunPtr->GetChildActorClass() == CharacterPtr->GetGlockWeaponBpRef())
+	{
+		GunDataPtr = CharacterPtr->GetSecondaryWeapon();
+		GunDataPtr->Class = CharacterPtr->GetGlockWeaponBpRef();
+	}
+
+	//DF("UnEquip AmmoCount = %d",AmmoCount)
 	GunDataPtr->AmmoCount = AmmoCount;
 	GunDataPtr->MaxAmmo = MaxAmmo;
 	GunDataPtr->ReloadTime = ReloadTime;
 	GunDataPtr->BulletSpread = BulletSpread;
-
 
 }

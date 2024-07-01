@@ -8,8 +8,8 @@
 #include "VIWeaponbase.generated.h"
 
 
-/* 무기들의 기본 뼈대가 되는 추상 베이스 클래스 */
-UCLASS(Abstract)
+/* 무기들의 기본 뼈대가 되는  베이스 클래스 */
+UCLASS()
 class VI_API AVIWeaponbase : public AActor
 {
 	GENERATED_BODY()

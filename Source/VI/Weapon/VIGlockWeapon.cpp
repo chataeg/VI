@@ -14,12 +14,13 @@
 
 AVIGlockWeapon::AVIGlockWeapon()
 {
-
+	D("GlockWeapon Constructor")
+		
 	MaxAmmo = 11;
 	AmmoCount = 11;
 	ReloadTime = 1.5f;
 	BulletSpread = 1500.0f;
-
+	
 
 
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> Glock_RiggedRef(TEXT("/Script/Engine.SkeletalMesh'/Game/WeaponAssets/RiggedMeshes/Glock_Rigged.Glock_Rigged'"));
@@ -322,13 +323,35 @@ void AVIGlockWeapon::MuzzleFlash()
 
 void AVIGlockWeapon::UnEquip()
 {
-	FGunData* GunDataPtr;	
+	Super::UnEquip();
+
+
 	APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 
 	AVICharacter* CharacterPtr = Cast<AVICharacter>(PC->GetCharacter());
-	GunDataPtr = CharacterPtr->GetSecondaryWeapon();
 
-	GunDataPtr->Class = CharacterPtr->GetGlockWeaponBpRef();
+
+	UChildActorComponent* GunPtr = CharacterPtr->GetGun();
+	FGunData* GunDataPtr;
+
+	GunDataPtr = CharacterPtr->GetPrimaryWeapon();
+
+	if (GunPtr->GetChildActorClass() == CharacterPtr->GetWeaponBaseBpRef())
+	{
+		//GunDataPtr->Class = CharacterPtr->GetWeaponBaseBpRef();
+	}
+	else if (GunPtr->GetChildActorClass() == CharacterPtr->GetAKWeaponBpRef())
+	{
+		GunDataPtr = CharacterPtr->GetPrimaryWeapon();
+		GunDataPtr->Class = CharacterPtr->GetAKWeaponBpRef();
+	}
+	else if (GunPtr->GetChildActorClass() == CharacterPtr->GetGlockWeaponBpRef())
+	{
+		GunDataPtr = CharacterPtr->GetSecondaryWeapon();
+		GunDataPtr->Class = CharacterPtr->GetGlockWeaponBpRef();
+	}
+
+	//DF("UnEquip AmmoCount = %d",AmmoCount)
 	GunDataPtr->AmmoCount = AmmoCount;
 	GunDataPtr->MaxAmmo = MaxAmmo;
 	GunDataPtr->ReloadTime = ReloadTime;
