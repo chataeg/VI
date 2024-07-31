@@ -21,7 +21,7 @@ V키를 눌러 총을 바닥에 떨어트릴 수 있습니다.
 # 게임 플레이 영상
 
 
-https://github.com/user-attachments/assets/49fe146d-2eac-4799-8994-a4250376fa23
+https://github.com/user-attachments/assets/c6d15ab2-3411-47b5-85f0-4936d7f7d721
 
 
 
