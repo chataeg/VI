@@ -2,6 +2,8 @@
 
 1인으로 제작한 1인칭 FPS 게임입니다.
 
+
+
 # 게임의 목표
 
 레벨에 설치되어 있는 타겟들을 쏴 맞혀 쓰러트리고 훈련을 종료합니다.
@@ -28,6 +30,9 @@ https://github.com/user-attachments/assets/c6d15ab2-3411-47b5-85f0-4936d7f7d721
 
 
 # 패키징 된 게임 다운로드 주소
+
+!주의! 현재 프로토타입으로 게임 종료 시에는 ALT+F4 를 사용해야 합니다.
+
 
 https://drive.google.com/file/d/1dDppYLxGDTSbG6Jjmff857hCsnCPnOnL/view?usp=drive_link
 
