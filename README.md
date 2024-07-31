@@ -1,3 +1,4 @@
+![제목 없음](https://github.com/user-attachments/assets/56219914-bdbd-412b-9c3a-c1a9b1af6b5c)
 
 1인으로 제작한 1인칭 FPS 게임입니다.
 
@@ -19,6 +20,8 @@ V키를 눌러 총을 바닥에 떨어트릴 수 있습니다.
 
 # 게임 플레이 영상
 
+
+https://github.com/user-attachments/assets/49fe146d-2eac-4799-8994-a4250376fa23
 
 
 
