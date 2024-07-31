@@ -250,6 +250,15 @@ void AVIGlockWeapon::LineTrace()
 						Character->GetFirstPersonMesh()->GetAnimInstance()->Montage_Play(GlockFireActionMontage, 1.0f);;
 					}
 
+					AActor* HitActor = HitResult.GetActor();
+					if (HitActor)
+					{
+
+						float Damage = 10.0f;
+						UGameplayStatics::ApplyDamage(HitActor, Damage, Character->GetController(), Character, nullptr);
+
+
+					}
 
 				}
 

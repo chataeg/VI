@@ -18,6 +18,8 @@ AVIWeaponbase::AVIWeaponbase()
  	D("Weaponbase constructor")
 	Mesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("PrimaryWeapon"));
 	Mesh->SetupAttachment(RootComponent);
+	Mesh->SetCastShadow(false);
+
 
 	Muzzle = CreateDefaultSubobject<USceneComponent>(TEXT("Muzzle"));
 	Muzzle->SetupAttachment(Mesh);
@@ -41,6 +43,7 @@ AVIWeaponbase::AVIWeaponbase()
 	ReloadTime = 0.0f;
 	BulletSpread = 0.0f; 
 	bDoOnceReload = false;
+	
 
 
 	static ConstructorHelpers::FClassFinder<AActor> BulletDecalBpRef(TEXT("/Script/Engine.Blueprint'/Game/VI/Character/Blueprint/Weapon/BP_BulletDecal.BP_BulletDecal_C'"));
@@ -84,10 +87,6 @@ void AVIWeaponbase::MuzzleFlash()
 
 void AVIWeaponbase::UnEquip()
 {
-	//D("UnEquip")
-
-	
-
 }
 
 void AVIWeaponbase::Equip()

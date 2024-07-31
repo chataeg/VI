@@ -77,8 +77,6 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon, Meta = (AllowPrivateAccess = "true"))
 	bool bIsReloading;
 
-
-
 	UPROPERTY(VisibleAnywhere,BlueprintReadWrite, Meta = (AllowPrivateAccess = "true"))
 	bool bEquippedWeapon;
 
@@ -86,15 +84,18 @@ protected:
 	int32 WeaponEquipped;
 
 
-
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess = "true"))
 	bool bADS;
 
 
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 Health;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess = "true"))
+	int32 TriggerIndex;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess = "true"))
+	int32 TargetNum;
 
 
 protected:

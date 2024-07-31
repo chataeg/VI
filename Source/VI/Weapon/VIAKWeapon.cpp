@@ -252,7 +252,7 @@ void AVIAKWeapon::LineTrace()
 					ColorsLifeTime
 				))
 				{
-				
+					//DF("Hit = %s", HitResult.GetActor()->GetName())
 					SpawnDecalTracer(Muzzle->GetComponentLocation(), HitResult.ImpactPoint, HitResult.ImpactPoint);
 					
 
@@ -268,6 +268,18 @@ void AVIAKWeapon::LineTrace()
 					}
 
 
+					AActor* HitActor = HitResult.GetActor();
+					if (HitActor)
+					{
+						
+						float Damage = 10.0f;
+						UGameplayStatics::ApplyDamage(HitActor, Damage, Character->GetController(), Character, nullptr);
+						
+						
+					}
+
+
+
 				}
 			
 
@@ -276,8 +288,6 @@ void AVIAKWeapon::LineTrace()
 
 		}
 	}
-	
-
 
 }
 

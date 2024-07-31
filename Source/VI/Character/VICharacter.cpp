@@ -58,11 +58,13 @@ AVICharacter::AVICharacter()
 	
 
 	bIsReloading = false;
-	bEquippedWeapon = true;
+	bEquippedWeapon = false;
 	WeaponEquipped = 0;
 	bADS = false;
 
 	Health = 100;
+	TriggerIndex = 0;
+	TargetNum = 0;
 	
 
 
@@ -232,7 +234,7 @@ void AVICharacter::BeginPlay()
 	ADSTimeline->SetLooping(false);
 	//ADSTimeline->SetTimelineFinishedFunc(ADSTimelineFinish);
 
-
+	
 
 
 }
@@ -259,9 +261,8 @@ void AVICharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	
 	EnhancedInputComponent->BindAction(ThrowWeaponAction, ETriggerEvent::Triggered, this, &AVICharacter::ThrowWeapon);
 
-
-
 	EnhancedInputComponent->BindAction(ADSAction, ETriggerEvent::Triggered, this, &AVICharacter::StartADS);
+
 	
 
 }
@@ -378,8 +379,8 @@ void AVICharacter::Look(const FInputActionValue& Value)
 	if (Controller != nullptr)
 	{
 		// add yaw and pitch input to controller
-		AddControllerYawInput(LookAxisVector.X);
-		AddControllerPitchInput(LookAxisVector.Y);
+		AddControllerYawInput(LookAxisVector.X * 0.55f);
+		AddControllerPitchInput(LookAxisVector.Y * 0.55f);
 	}
 }
 
@@ -418,11 +419,14 @@ void AVICharacter::EquipFirst()
 		
 			if (PrimaryWeapon.Class == WeaponBaseBpRef)
 			{
+
+				bEquippedWeapon = false;
 				Gun->SetChildActorClass(WeaponBaseBpRef);
 				FirstPersonMesh->SetVisibility(false);
 			}
 			else
 			{
+				bEquippedWeapon = true;
 				AVIWeaponbase* ReCastedGunRef = Cast<AVIWeaponbase>(Gun->GetChildActor());
 				DF("PrimaryWeapon AmmoCount = %d", PrimaryWeapon.AmmoCount);
 			
@@ -459,13 +463,15 @@ void AVICharacter::EquipSecond()
 
 				if (SecondaryWeapon.Class == WeaponBaseBpRef)
 				{
+
+					bEquippedWeapon = false;
 					Gun->SetChildActorClass(WeaponBaseBpRef);
 					FirstPersonMesh->SetVisibility(false);
 				//	D("SecondaryWeapon is empty")
 				}
 				else
 				{
-				
+					bEquippedWeapon = 1;
 					AVIWeaponbase* ReCastedGunRef = Cast<AVIWeaponbase>(Gun->GetChildActor());
 
 					ReCastedGunRef->SetAmmoCount(SecondaryWeapon.AmmoCount);
@@ -480,6 +486,7 @@ void AVICharacter::EquipSecond()
 
 void AVICharacter::SetupFirst()
 {
+	/*
 	D("SetupFirst")
 	PrimaryWeapon.Class = AKWeaponBpRef;
 	PrimaryWeapon.AmmoCount = 30;
@@ -489,21 +496,24 @@ void AVICharacter::SetupFirst()
 	DF("PrimaryWeapon AmmoCount = %d", PrimaryWeapon.AmmoCount);
 
 //	DF("Secondary Weapon %d", (SecondaryWeapon.Class == GlockWeaponBpRef) ? 1 : 0)
-
+*/
 }
 
 void AVICharacter::SetupSecond()
 {
 //	D("SetupSecond")
+	/*
 	SecondaryWeapon.Class = GlockWeaponBpRef;
 	SecondaryWeapon.AmmoCount = 11;
 	SecondaryWeapon.MaxAmmo = 11;
 	SecondaryWeapon.ReloadTime = 1.5f;
 	SecondaryWeapon.BulletSpread = 1500.0f;
+	*/
 }
 
 void AVICharacter::ThrowWeapon()
 {
+	bEquippedWeapon = false;
 	switch (WeaponEquipped)
 	{
 	case 0:
@@ -532,11 +542,6 @@ void AVICharacter::ThrowWeapon()
 			Gun->SetChildActorClass(WeaponBaseBpRef);
 
 			FirstPersonMesh->SetVisibility(false);
-
-
-
-
-				
 		}
 
 
@@ -587,17 +592,14 @@ void AVICharacter::ADSTimeLineFunc(float value)
 		FirstPersonMesh->SetRelativeRotation(FRotator(0.0f, -1.0f, 0.0f));
 
 	}
-	else
-	{
-		GetCamera()->SetFieldOfView(FMath::Lerp(90.0f, 45.0f, value));
-		FirstPersonMesh->SetRelativeLocation(FMath::Lerp(FVector(1.6f, 7.8f, -23.6f), FVector(1.6f, 0.0f, -16.0f), value));
-		FirstPersonMesh->SetRelativeRotation(FRotator(0.0f, -1.0f, 0.0f));
 
-	}
 }
 
 void AVICharacter::StartADS()
 {
+	DF("bEquippedWeapon = % d", bEquippedWeapon)
+	if (!bEquippedWeapon) return;
+
 	if (!bADS)
 	{
 		D("StartADS")
