@@ -34,8 +34,7 @@ https://github.com/user-attachments/assets/c6d15ab2-3411-47b5-85f0-4936d7f7d721
 
 !주의! 현재 프로토타입으로 게임 종료 시에는 ALT+F4 를 사용해야 합니다.
 
-
-https://drive.google.com/file/d/1dDppYLxGDTSbG6Jjmff857hCsnCPnOnL/view?usp=drive_link
+https://drive.google.com/file/d/1eeeLtxRSIIYAFPqYhvOK2to4jTJwCZ0f/view?usp=sharing
 
 # 에디터에서 게임 실행 방법
 
