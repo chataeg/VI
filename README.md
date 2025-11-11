@@ -27,15 +27,6 @@ V키를 눌러 총을 바닥에 떨어트릴 수 있습니다.
 https://github.com/user-attachments/assets/c6d15ab2-3411-47b5-85f0-4936d7f7d721
 
 
-
-
-
-# 패키징 된 게임 다운로드 주소
-
-!주의! 현재 프로토타입으로 게임 종료 시에는 ALT+F4 를 사용해야 합니다.
-
-https://drive.google.com/file/d/1eeeLtxRSIIYAFPqYhvOK2to4jTJwCZ0f/view?usp=sharing
-
 # 에디터에서 게임 실행 방법
 
 대용량 파일을 제거하고 커밋해 놓은 상태이므로 아래 주소에서 에셋을 다운받은 뒤
