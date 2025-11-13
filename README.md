@@ -35,8 +35,7 @@ https://drive.google.com/file/d/1l2qBDke7jPNv5BU4luW7ZAi2VGn45oA_/view?usp=drive
 Content 폴더에 압축을 해제 한 뒤 붙여넣기 한 후 실행하면 됩니다.
 --- 
 
-
-![Uploading portfolio_page-0027.jpg…]()
+![portfolio_page-0027](https://github.com/user-attachments/assets/723fe82f-35ab-4256-81c0-d6b87f94b260)
 
 ![portfolio_page-0028](https://github.com/user-attachments/assets/f2b61626-859a-4044-9282-9ee32c244f96)
 
