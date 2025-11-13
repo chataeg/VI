@@ -31,13 +31,14 @@ https://github.com/user-attachments/assets/c6d15ab2-3411-47b5-85f0-4936d7f7d721
 
 대용량 파일을 제거하고 커밋해 놓은 상태이므로 아래 주소에서 에셋을 다운받은 뒤
 https://drive.google.com/file/d/1l2qBDke7jPNv5BU4luW7ZAi2VGn45oA_/view?usp=drive_link
-
 Content 폴더에 압축을 해제 한 뒤 붙여넣기 한 후 실행하면 됩니다.
+
 --- 
 
 ![portfolio_page-0027](https://github.com/user-attachments/assets/723fe82f-35ab-4256-81c0-d6b87f94b260)
 
 ![portfolio_page-0028](https://github.com/user-attachments/assets/f2b61626-859a-4044-9282-9ee32c244f96)
+![portfolio_page-0029](https://github.com/user-attachments/assets/1798b90b-439f-4338-93c9-d07d570a2af0)
 
 ![portfolio_page-0030](https://github.com/user-attachments/assets/64acaaef-223b-4a32-a4d4-c2370b13a49e)
 
